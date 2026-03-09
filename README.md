@@ -173,7 +173,7 @@ The natural next step is to make this framework operate in real-time. Below is t
 
 ---
 
-## PhD-Level Research Workflow
+## Research Workflow
 
 For researchers looking to extend this work, here is the recommended logical workflow:
 
