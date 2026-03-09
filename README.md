@@ -130,45 +130,66 @@ The full research report is available at [`outputs/final_report.pdf`](outputs/fi
 
 ---
 
-## Roadmap: Real-Time Extension
+## Roadmap
 
-### Phase 4: Live Monitoring System (Proposed)
+### Phase 4: Statistical Robustness (Next Priority)
 
-The natural next step is to make this framework operate in real-time. Below is the proposed architecture:
+The findings are descriptive and the measurements are valid, but any prospective use requires rigorous validation.
 
-#### 4.1 Streaming Data Pipeline
+#### 4.1 Walk-Forward Validation
+- [ ] Split: train on 2019-2022, test on 2023-2024. Re-train on 2019-2024, test on 2025-2026
+- [ ] Does cross-layer Granger causality (tail -> Pearson CMI) hold out of sample?
+- [ ] Does the topology crystallization pattern (restructuring before the event) replicate?
+- [ ] Track false positive rate of early warning signals in the test set
+
+#### 4.2 Bootstrap & Confidence Intervals
+- [ ] Resample rolling windows 1,000x, recompute TE rankings each time
+- [ ] Are leaders/followers stable or noise? Publish confidence bands
+- [ ] Bootstrap the cross-layer Granger F-statistic to verify p=0.041 is robust
+
+#### 4.3 Sensitivity Analysis
+- [ ] Window size: 90 / 120 / 150 / 180 days — do findings survive?
+- [ ] Top-k threshold: 3 / 5 / 7 / 10 neighbors — does cluster structure change?
+- [ ] Leiden resolution: 0.5 to 2.0 sweep — are community assignments stable?
+- [ ] Tail quantile: 1% / 5% / 10% — how sensitive is tail dependence?
+
+#### 4.4 Multiple Testing Correction
+- [ ] Apply Bonferroni and Benjamini-Hochberg FDR to all 1,560 Granger pairs
+- [ ] Re-assess which individual causal links survive correction
+- [ ] Note: 1,189/1,560 significant at p<0.05 means the aggregate picture is real, but individual pairs need scrutiny
+
+#### 4.5 Small-Sample Robustness
+- [ ] Regime-conditional TE uses small sub-samples (Twelve-Day War = ~8 trading days feeding windows)
+- [ ] Apply block bootstrap preserving temporal structure
+- [ ] Consider surrogate data testing (shuffle time series, recompute TE, compare to observed)
+
+### Phase 5: Real-Time Extension
+
+#### 5.1 Streaming Pipeline
 - [ ] Replace batch FMP fetch with streaming price feed (WebSocket or polling)
-- [ ] Implement incremental rolling window update (append new day, drop oldest)
-- [ ] Add intraday granularity option (hourly windows for faster signal detection)
-- [ ] Integrate alternative data: news sentiment (NLP), options implied vol surface, CDS spreads
+- [ ] Incremental rolling window update (append new day, drop oldest)
+- [ ] Intraday granularity option (hourly windows for faster signal detection)
 
-#### 4.2 Real-Time Metric Computation
-- [ ] Incremental shrinkage correlation update (rank-1 update instead of full recompute)
-- [ ] Online Leiden clustering with warm-start from previous partition
+#### 5.2 Real-Time Computation
+- [ ] Incremental shrinkage correlation (rank-1 update instead of full recompute)
+- [ ] Online Leiden with warm-start from previous partition
 - [ ] Streaming transfer entropy with exponential decay weighting
-- [ ] Real-time layer agreement and cross-layer causality monitoring
 
-#### 4.3 Dashboard & Alerting
-- [ ] Web dashboard (Streamlit or Dash) showing live CMI, TDS, layer agreement
-- [ ] Alert system: configurable thresholds on tail CMI, layer agreement, TE leadership reversals
-- [ ] Historical comparison overlay (current vs. COVID, vs. Epic Fury buildup)
+#### 5.3 Dashboard & Alerting
+- [ ] Web dashboard (Streamlit or Dash): live CMI, TDS, layer agreement
+- [ ] Configurable alert thresholds on tail CMI, layer agreement, TE leadership reversals
+- [ ] Historical comparison overlay (current window vs. COVID, vs. Epic Fury buildup)
 - [ ] Interactive cluster network visualization (D3.js or Plotly)
 
-#### 4.4 Backtesting Framework
-- [ ] Walk-forward validation of cross-layer Granger causality signal
-- [ ] Out-of-sample testing of topology crystallization pattern
-- [ ] Monte Carlo simulation of cluster-aware allocation strategies
-- [ ] Transaction cost and turnover analysis for rebalancing triggers
-
-### Phase 5: Extended Research (Proposed)
+### Phase 6: Extended Research
 
 - [ ] **Extend to 2008**: Source pre-2010 data for ETFs that existed (SPY, QQQ, TLT, GLD) to include the GFC
 - [ ] **Higher-frequency analysis**: Intraday 5-min returns during crisis windows
-- [ ] **Cross-market extension**: Add sovereign CDS, VIX term structure, yield curve factors
-- [ ] **Machine learning regime detection**: Replace HMM with neural regime-switching models
-- [ ] **Causal discovery**: Apply PCMCI+ or DYNOTEARS for full causal graph learning
-- [ ] **Crypto deep-dive**: Expand to individual tokens (BTC, ETH, SOL) + DeFi indices
-- [ ] **Geopolitical NLP layer**: Integrate GDELT or news embeddings as an additional similarity layer
+- [ ] **Cross-market extension**: Sovereign CDS, VIX term structure, yield curve factors
+- [ ] **Causal discovery**: PCMCI+ or DYNOTEARS for full causal graph learning
+- [ ] **Geopolitical NLP layer**: GDELT or news embeddings as an additional similarity layer
+- [ ] **Crypto deep-dive**: Individual tokens (BTC, ETH, SOL) + DeFi indices
+- [ ] **Alternative clustering**: Infomap, Stochastic Block Models, compare to Leiden
 - [ ] **Publication**: Target Journal of Financial Economics, Review of Financial Studies, or Journal of Portfolio Management
 
 ---
@@ -196,30 +217,32 @@ For researchers looking to extend this work, here is the recommended logical wor
    ├── Regime-conditional leadership reversal
    └── Cross-layer Granger causality (key discovery)
 
-4. VALIDATION & ROBUSTNESS (Next Priority)
-   ├── Walk-forward out-of-sample testing
-   ├── Bootstrap confidence intervals on TE rankings
-   ├── Sensitivity to window size, threshold, resolution
-   ├── Alternative clustering algorithms (Infomap, SBM)
-   └── Multiple testing correction (Bonferroni, FDR)
+4. STATISTICAL ROBUSTNESS (Next Priority)
+   ├── Walk-forward validation (train 2019-2022, test 2023-2026)
+   ├── Bootstrap confidence intervals on TE rankings (1,000 resamples)
+   ├── Sensitivity sweep: window size, top-k, resolution, tail quantile
+   ├── Multiple testing correction (Bonferroni, FDR on 1,560 Granger pairs)
+   ├── Small-sample robustness: block bootstrap, surrogate data testing
+   └── Alternative clustering (Infomap, SBM) as cross-validation of Leiden
 
 5. REAL-TIME EXTENSION
-   ├── Streaming architecture design
-   ├── Incremental computation algorithms
-   ├── Dashboard + alerting system
+   ├── Streaming data pipeline + incremental rolling window
+   ├── Dashboard (Streamlit/Dash): live CMI, TDS, layer agreement
+   ├── Alert system on tail CMI, TE leadership reversals
    └── Live validation against emerging events
 
-6. THEORETICAL CONTRIBUTION
-   ├── Formal proof: conditions under which tail CMI leads Pearson CMI
-   ├── Topology crystallization: formalize as a phase transition
-   ├── Information-theoretic bounds on early warning lead time
-   └── Connection to market microstructure (order flow, liquidity)
+6. EXTENDED RESEARCH
+   ├── Extend to 2008 (GFC) with available ETFs
+   ├── Intraday 5-min analysis during crisis windows
+   ├── Causal discovery (PCMCI+, DYNOTEARS)
+   ├── Geopolitical NLP layer (GDELT, news embeddings)
+   └── Crypto deep-dive (BTC, ETH, SOL, DeFi indices)
 
 7. PUBLICATION
-   ├── Working paper with full methodology + proofs
+   ├── Working paper with full methodology
    ├── Replication package (this repository)
    ├── Conference presentations (AFA, EFA, INFORMS)
-   └── Journal submission
+   └── Journal submission (JFE, RFS, JPM)
 ```
 
 ## Contributing
