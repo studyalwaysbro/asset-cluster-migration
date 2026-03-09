@@ -87,7 +87,7 @@ Asset Cluster Migration/
 
 ```bash
 # Clone
-git clone https://github.com/YOUR_USERNAME/asset-cluster-migration.git
+git clone https://github.com/studyalwaysbro/asset-cluster-migration.git
 cd asset-cluster-migration
 
 # Setup
@@ -239,7 +239,7 @@ If you use this work in academic research, please cite:
   title={Dynamic Multi-Asset Topology and Cluster Migration Under Geopolitical Stress},
   author={Tavares, Nicholas and Hanini, Amjad and DaSilva, Brandon},
   year={2026},
-  note={Available at: https://github.com/YOUR_USERNAME/asset-cluster-migration}
+  note={Available at: https://github.com/studyalwaysbro/asset-cluster-migration}
 }
 ```
 

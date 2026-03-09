@@ -12,7 +12,7 @@ Thank you for your interest in contributing! This project is an open academic re
 
 ### 1. Fork & Branch
 ```bash
-git fork https://github.com/YOUR_USERNAME/asset-cluster-migration.git
+git fork https://github.com/studyalwaysbro/asset-cluster-migration.git
 git checkout -b feature/your-feature-name
 ```
 
