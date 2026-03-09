@@ -6,6 +6,7 @@
 
 - **Nicholas Tavares**
 - **Amjad Hanini**
+- **Brandon Dasilva**
 
 ## Overview
 
