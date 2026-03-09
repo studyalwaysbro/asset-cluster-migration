@@ -196,7 +196,7 @@ The findings are descriptive and the measurements are valid, but any prospective
 
 ## Research Workflow
 
-For researchers looking to extend this work, here is the recommended logical workflow:
+The mutable logical workflow:
 
 ```
 1. FOUNDATION (Completed)
