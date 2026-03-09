@@ -1,0 +1,66 @@
+# Asset Universe Definition
+# Phase 1: 42 diversified ETFs
+
+data_source: fmp
+start_date: "2019-01-01"
+end_date: null  # null = today
+frequency: daily
+
+assets:
+  us_equity_benchmarks:
+    - {ticker: SPY, name: "S&P 500", category: equity_us}
+    - {ticker: QQQ, name: "Nasdaq 100", category: equity_us}
+    - {ticker: IWM, name: "Russell 2000", category: equity_us}
+    - {ticker: DIA, name: "Dow Jones", category: equity_us}
+
+  us_sectors:
+    - {ticker: XLE, name: "Energy", category: sector}
+    - {ticker: XLF, name: "Financials", category: sector}
+    - {ticker: XLV, name: "Health Care", category: sector}
+    - {ticker: XLU, name: "Utilities", category: sector}
+    - {ticker: XLI, name: "Industrials", category: sector}
+    - {ticker: XLK, name: "Technology", category: sector}
+    - {ticker: XLP, name: "Staples", category: sector}
+    - {ticker: XLRE, name: "Real Estate", category: sector}
+
+  international:
+    - {ticker: EFA, name: "MSCI EAFE", category: equity_intl}
+    - {ticker: EEM, name: "MSCI EM", category: equity_em}
+    - {ticker: FXI, name: "China", category: equity_em}
+    - {ticker: EWZ, name: "Brazil", category: equity_em}
+    - {ticker: EWJ, name: "Japan", category: equity_intl}
+    - {ticker: VGK, name: "Europe", category: equity_intl}
+
+  fixed_income:
+    - {ticker: TLT, name: "20+ Yr Treasury", category: bond_govt}
+    - {ticker: IEF, name: "7-10 Yr Treasury", category: bond_govt}
+    - {ticker: SHY, name: "1-3 Yr Treasury", category: bond_govt}
+    - {ticker: LQD, name: "IG Corp", category: bond_credit}
+    - {ticker: HYG, name: "High Yield", category: bond_credit}
+    - {ticker: EMB, name: "EM Bonds", category: bond_em}
+
+  commodities:
+    - {ticker: GLD, name: "Gold", category: commodity}
+    - {ticker: SLV, name: "Silver", category: commodity}
+    - {ticker: GDX, name: "Gold Miners", category: commodity}
+    - {ticker: USO, name: "Crude Oil", category: commodity}
+    - {ticker: DBA, name: "Agriculture", category: commodity}
+    - {ticker: DBC, name: "Broad Commodities", category: commodity}
+    - {ticker: VNQ, name: "Real Estate REIT", category: real_asset}
+
+  fx_volatility:
+    - {ticker: UUP, name: "Dollar Bull", category: fx}
+    - {ticker: FXE, name: "Euro", category: fx}
+    - {ticker: FXY, name: "Yen", category: fx}
+    - {ticker: VIXY, name: "VIX Short-Term", category: volatility}
+
+  thematic:
+    - {ticker: ITA, name: "Aerospace Defense", category: thematic}
+    - {ticker: XAR, name: "S&P Aero Defense", category: thematic}
+    - {ticker: IBIT, name: "Bitcoin Trust", category: crypto, inception: "2024-01-11"}
+    - {ticker: BITO, name: "Bitcoin Strategy", category: crypto, inception: "2021-10-19"}
+
+  alternatives:
+    - {ticker: TIP, name: "TIPS", category: inflation}
+    - {ticker: PDBC, name: "Optimum Yield", category: commodity}
+    - {ticker: GOVT, name: "US Treasury Bond", category: bond_govt}

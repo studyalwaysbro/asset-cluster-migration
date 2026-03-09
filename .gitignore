@@ -1,0 +1,46 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Data (raw data gitignored, processed snapshots tracked if small)
+data/raw/
+
+# Outputs (large intermediates excluded, figures and report tracked)
+outputs/*.log
+outputs/*.tmp
+!outputs/figures/
+!outputs/final_report.pdf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets baseline
+.secrets.baseline
+
+# Temp files
+_section_*.md
+_writer.py
+_write_doc.py
+
+# Claude Code
+.claude/

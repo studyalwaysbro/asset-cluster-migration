@@ -1,0 +1,1 @@
+"""Report figure generation orchestrator."""

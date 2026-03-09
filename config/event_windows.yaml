@@ -1,0 +1,80 @@
+# Event Study Window Definitions
+#
+# Timeline source: April 2024 Iran-Israel direct confrontation cycle
+#   - Apr 1: Israeli strike on Iranian consulate in Damascus (killed IRGC commanders)
+#   - Apr 1-12: Escalation/anticipation (Iran telegraphed retaliation ~12 days)
+#   - Apr 13-14 (Sat-Sun): Operation True Promise I (~170 drones, 30+ cruise, 120+ ballistic)
+#   - Apr 15 (Mon): First trading day reaction
+#   - Apr 19: Israel's restrained counter-strike on Isfahan
+#   - Apr 22+: Mutual de-escalation signals
+#
+# Key market reactions:
+#   - Oil: Brent spiked toward $92/bbl, reversed on successful interception
+#   - Gold: Pushed above $2400/oz (new ATH), geopolitical premium additive to trend
+#   - Equities: S&P dipped ~1-2%, VIX spiked briefly to high teens / low 20s
+#   - Treasuries: Modest safe-haven bid, muted by Fed rate path dominance
+#   - Defense stocks: Positive (successful interception = live advertisement)
+#   - Correlation spike: Classic risk-off pattern, but short-lived (2-5 trading days)
+#
+# Confounding: CPI print April 10 ran hot (affects Treasuries/equities independently)
+
+events:
+  iran_shock_2024:
+    name: "Iran-Israel Escalation April 2024 (Operation True Promise I)"
+    description: "First-ever direct Iran-Israel military exchange. Iranian drone/missile attack Apr 13-14, Israeli counter-strike Apr 19."
+    pre_start: "2024-01-02"
+    pre_end: "2024-03-31"
+    event_start: "2024-04-01"
+    event_end: "2024-04-30"
+    post_start: "2024-05-01"
+    post_end: "2024-06-28"
+    peak_stress_date: "2024-04-15"
+    sub_windows:
+      pre_calm: ["2024-03-15", "2024-03-31"]
+      escalation_buildup: ["2024-04-01", "2024-04-12"]
+      acute_shock: ["2024-04-13", "2024-04-15"]
+      counter_response: ["2024-04-16", "2024-04-22"]
+      digestion: ["2024-04-23", "2024-05-10"]
+      normalization: ["2024-05-11", "2024-05-31"]
+    confounders:
+      - "CPI print April 10, 2024 (hot) - affects Treasuries independently"
+
+  iran_shock_oct_2024:
+    name: "Iran-Israel Escalation October 2024 (Operation True Promise II)"
+    description: "Second direct exchange. ~180 ballistic missiles Oct 1. Israeli restrained counter-strike Oct 26 (no oil infra)."
+    pre_start: "2024-09-01"
+    pre_end: "2024-09-30"
+    event_start: "2024-10-01"
+    event_end: "2024-10-28"
+    post_start: "2024-10-29"
+    post_end: "2024-11-30"
+    peak_stress_date: "2024-10-01"
+    sub_windows:
+      pre_escalation: ["2024-09-15", "2024-09-30"]
+      acute_shock: ["2024-10-01", "2024-10-03"]
+      anticipation_of_response: ["2024-10-04", "2024-10-25"]
+      resolution_relief: ["2024-10-26", "2024-10-28"]
+      normalization: ["2024-10-29", "2024-11-15"]
+    confounders:
+      - "US presidential election campaign"
+      - "Q3 earnings season"
+      - "Nasrallah assassination Sep 27 (related escalation)"
+
+  # Phase 2 event studies
+  # svb_banking_stress:
+  #   name: "SVB Banking Stress March 2023"
+  #   pre_start: "2022-12-01"
+  #   pre_end: "2023-03-08"
+  #   event_start: "2023-03-09"
+  #   event_end: "2023-04-14"
+  #   post_start: "2023-04-15"
+  #   post_end: "2023-06-30"
+
+  # fed_repricing_2022:
+  #   name: "Fed Hawkish Repricing 2022"
+  #   pre_start: "2021-09-01"
+  #   pre_end: "2021-12-31"
+  #   event_start: "2022-01-01"
+  #   event_end: "2022-06-30"
+  #   post_start: "2022-07-01"
+  #   post_end: "2022-09-30"
