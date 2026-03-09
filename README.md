@@ -4,9 +4,8 @@
 
 ## Authors
 
-- **Nicholas Tavares** - Lead Researcher
-- **Amjad Hanini** - Contributor
-- **Brandon DaSilva** - Contributor
+- **Nicholas Tavares**
+- **Amjad Hanini**
 
 ## Overview
 
@@ -245,10 +244,6 @@ For researchers looking to extend this work, here is the recommended logical wor
    └── Journal submission (JFE, RFS, JPM)
 ```
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on how to contribute to this project.
-
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
@@ -260,7 +255,7 @@ If you use this work in academic research, please cite:
 ```bibtex
 @misc{tavares2026topology,
   title={Dynamic Multi-Asset Topology and Cluster Migration Under Geopolitical Stress},
-  author={Tavares, Nicholas and Hanini, Amjad and DaSilva, Brandon},
+  author={Tavares, Nicholas and Hanini, Amjad},
   year={2026},
   note={Available at: https://github.com/studyalwaysbro/asset-cluster-migration}
 }
