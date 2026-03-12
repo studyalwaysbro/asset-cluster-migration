@@ -6,6 +6,7 @@
 
 - **Nicholas Tavares**
 - **Amjad Hanini**
+- **Brandon Dasilva**
 
 ## Overview
 
@@ -248,7 +249,7 @@ Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGE
 
 ## Research Workflow
 
-For researchers looking to extend this work, here is the recommended logical workflow:
+The mutable logical workflow:
 
 ```
 1. FOUNDATION (Completed)
@@ -309,7 +310,7 @@ If you use this work in academic research, please cite:
 ```bibtex
 @misc{tavares2026topology,
   title={Dynamic Multi-Asset Topology and Cluster Migration Under Geopolitical Stress},
-  author={Tavares, Nicholas and Hanini, Amjad},
+  author={Tavares, Nicholas and Hanini, Amjad and Dasilva, Brandon},
   year={2026},
   note={Available at: https://github.com/studyalwaysbro/asset-cluster-migration}
 }
