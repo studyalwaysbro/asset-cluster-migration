@@ -4,10 +4,12 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
 import httpx
+import numpy as np
 import pandas as pd
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -68,6 +70,28 @@ class BandwidthTracker:
         return self.total_bytes / 1e9
 
 
+def _is_us_market_open() -> bool:
+    """Check if US equity market is currently in session (approx)."""
+    try:
+        from zoneinfo import ZoneInfo
+    except ImportError:
+        from backports.zoneinfo import ZoneInfo  # type: ignore[no-redef]
+
+    now_et = datetime.now(ZoneInfo("America/New_York"))
+    if now_et.weekday() >= 5:
+        return False
+    market_open = now_et.replace(hour=9, minute=30, second=0, microsecond=0)
+    market_close = now_et.replace(hour=16, minute=0, second=0, microsecond=0)
+    return market_open <= now_et <= market_close
+
+
+def _last_business_day() -> date:
+    """Return the most recent business day (today if weekday, else Friday)."""
+    today = date.today()
+    offset = max(0, today.weekday() - 4)  # Sat=1, Sun=2
+    return today - timedelta(days=offset)
+
+
 class FMPClient:
     """Async FMP client using the stable API (post-Aug 2025)."""
 
@@ -101,12 +125,34 @@ class FMPClient:
     def _cache_path(self, symbol: str, endpoint: str) -> Path:
         return self.cache_dir / f"{symbol}_{endpoint}.parquet"
 
-    def _check_cache(self, symbol: str, endpoint: str) -> pd.DataFrame | None:
+    def _check_cache(
+        self, symbol: str, endpoint: str, max_staleness_days: int = 1
+    ) -> pd.DataFrame | None:
+        """Return cached data if fresh enough, else None.
+
+        A cache entry is considered stale if its most recent row is older
+        than *max_staleness_days* business days.  Pass ``max_staleness_days=0``
+        to always re-fetch.
+        """
         path = self._cache_path(symbol, endpoint)
-        if path.exists():
-            logger.debug(f"Cache hit: {symbol}")
-            return pd.read_parquet(path)
-        return None
+        if not path.exists():
+            return None
+
+        df = pd.read_parquet(path)
+        if df.empty:
+            return None
+
+        last_cached = pd.Timestamp(df.index.max()).date()
+        target = _last_business_day()
+        stale_cutoff = target - timedelta(days=max_staleness_days)
+        if last_cached < stale_cutoff:
+            logger.info(
+                f"Cache stale for {symbol}: last={last_cached}, target={target}"
+            )
+            return None
+
+        logger.debug(f"Cache hit: {symbol}")
+        return df
 
     def _write_cache(self, df: pd.DataFrame, symbol: str, endpoint: str) -> None:
         path = self._cache_path(symbol, endpoint)
@@ -125,10 +171,33 @@ class FMPClient:
         response.raise_for_status()
         return response.json()
 
+    async def get_quote(self, symbol: str) -> dict[str, Any] | None:
+        """Fetch the real-time (or latest) quote for a symbol."""
+        try:
+            data = await self._request_stable("quote", {"symbol": symbol})
+            if data and isinstance(data, list):
+                return data[0]
+            if data and isinstance(data, dict):
+                return data
+        except Exception as e:
+            logger.debug(f"Quote failed for {symbol}: {e}")
+        return None
+
     async def get_historical_prices(
-        self, symbol: str, from_date: str, to_date: str | None = None
+        self,
+        symbol: str,
+        from_date: str,
+        to_date: str | None = None,
+        extend_to_today: bool = True,
     ) -> pd.DataFrame:
-        """Fetch daily dividend-adjusted prices for a symbol."""
+        """Fetch daily dividend-adjusted prices for a symbol.
+
+        Parameters
+        ----------
+        extend_to_today : bool
+            If True and the historical data does not cover today, append
+            the latest quote using close as a fallback for adjClose.
+        """
         cached = self._check_cache(symbol, "historical")
         if cached is not None:
             return cached
@@ -149,7 +218,50 @@ class FMPClient:
         df["date"] = pd.to_datetime(df["date"])
         df = df.set_index("date").sort_index()
 
+        if extend_to_today:
+            df = await self._maybe_extend_today(df, symbol)
+
         self._write_cache(df, symbol, "historical")
+        return df
+
+    async def _maybe_extend_today(
+        self, df: pd.DataFrame, symbol: str
+    ) -> pd.DataFrame:
+        """Append today's quote if historical data does not cover it."""
+        if df.empty:
+            return df
+
+        today = pd.Timestamp(date.today())
+        last_date = df.index.max()
+
+        if last_date >= today:
+            return df
+
+        if today.weekday() >= 5:
+            return df
+
+        quote = await self.get_quote(symbol)
+        if quote is None:
+            return df
+
+        price = quote.get("price") or quote.get("previousClose")
+        if price is None:
+            return df
+
+        new_row = {col: np.nan for col in df.columns}
+        new_row["close"] = float(price)
+        new_row["adjClose"] = float(price)
+        new_row["open"] = float(quote.get("open", price))
+        new_row["high"] = float(quote.get("dayHigh", price))
+        new_row["low"] = float(quote.get("dayLow", price))
+        new_row["volume"] = int(quote.get("volume", 0))
+
+        today_row = pd.DataFrame(
+            [new_row], index=pd.DatetimeIndex([today], name="date")
+        )
+        today_row = today_row.reindex(columns=df.columns)
+        df = pd.concat([df, today_row])
+        logger.info(f"{symbol}: extended to {today.date()} via quote (close={price})")
         return df
 
     async def batch_fetch(
@@ -158,6 +270,7 @@ class FMPClient:
         from_date: str,
         to_date: str | None = None,
         max_concurrent: int = 10,
+        extend_to_today: bool = True,
     ) -> dict[str, pd.DataFrame]:
         """Fetch historical prices for multiple symbols with concurrency control."""
         semaphore = asyncio.Semaphore(max_concurrent)
@@ -167,7 +280,7 @@ class FMPClient:
             async with semaphore:
                 try:
                     results[symbol] = await self.get_historical_prices(
-                        symbol, from_date, to_date
+                        symbol, from_date, to_date, extend_to_today=extend_to_today
                     )
                     logger.info(f"Fetched {symbol}: {len(results[symbol])} rows")
                 except Exception as e:

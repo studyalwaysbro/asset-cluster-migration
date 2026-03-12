@@ -61,7 +61,8 @@ def build_mst(D: np.ndarray, labels: list[str]) -> nx.Graph:
     n = len(labels)
     for i in range(n):
         for j in range(i + 1, n):
-            w = mst_dense[i, j] + mst_dense[j, i]
+            # MST is stored in upper triangle; take max to handle either
+            w = max(mst_dense[i, j], mst_dense[j, i])
             if w > 0:
                 G.add_edge(labels[i], labels[j], weight=float(w))
 

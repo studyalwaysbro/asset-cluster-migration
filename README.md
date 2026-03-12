@@ -9,7 +9,7 @@
 
 ## Overview
 
-A quantitative research framework that tracks how multi-asset portfolio structures reorganize during geopolitical crises. We apply graph theory, community detection, information theory, and multi-layer network analysis to a universe of 43 ETFs spanning equities, bonds, commodities, currencies, crypto, and the Israeli market (EIS) from January 2019 through March 2026.
+A quantitative research framework that tracks how multi-asset portfolio structures reorganize during geopolitical crises. We apply graph theory, community detection, information theory, and multi-layer network analysis to a universe of 91 ETFs spanning equities, fixed income, commodities, currencies, crypto, managed futures, thematics, and 18 country-specific funds from January 2019 through the most recent trading day.
 
 ### Three-Phase Architecture
 
@@ -50,13 +50,21 @@ Asset Cluster Migration/
 │   │   └── topology.py        # Laplacian eigenvalues, spectral distance
 │   ├── clustering/
 │   │   ├── community.py       # Leiden, spectral, consensus
-│   │   └── multiplex.py       # Multiplex consensus + layer agreement
+│   │   ├── multiplex.py       # Multiplex consensus + layer agreement
+│   │   └── kmeans.py          # K-Means baseline comparison engine
 │   ├── migration/
 │   │   ├── metrics.py         # CMI, AMF, CPS, TDS (novel metrics)
 │   │   └── tracking.py        # Migration path tracking, flow matrices
 │   ├── regimes/
 │   │   ├── hmm.py             # Hidden Markov Model regime detection
-│   │   └── changepoints.py    # PELT changepoint detection
+│   │   ├── changepoint.py     # PELT changepoint detection
+│   │   └── validation.py      # OOS regime validation (TimeSeriesSplit)
+│   ├── robustness/            # Phase 4: Statistical robustness framework
+│   │   ├── walk_forward.py    # Walk-forward validation (train/test splits)
+│   │   ├── bootstrap.py       # Block bootstrap CIs (Politis & Romano 1992)
+│   │   ├── sensitivity.py     # Hyperparameter sensitivity sweeps
+│   │   ├── multiple_testing.py # Bonferroni, BH-FDR, Storey q-value
+│   │   └── surrogate_testing.py # Surrogate data + power analysis
 │   └── pipeline/
 │       └── orchestrator.py    # Full pipeline orchestrator
 ├── outputs/
@@ -65,22 +73,26 @@ Asset Cluster Migration/
 ├── data/
 │   ├── raw/                   # Cached API responses (gitignored)
 │   └── processed/             # Parquet files: returns, correlations, assignments, TE matrices
+├── CHANGELOG.md               # Version history (patch notes)
 ├── Makefile                   # Pipeline automation
 └── pyproject.toml             # Dependencies
 ```
 
-## Asset Universe (43 ETFs)
+## Asset Universe (91 ETFs)
 
-| Category | Tickers | Purpose |
-|----------|---------|---------|
-| US Equity | SPY, QQQ, IWM, DIA | Core benchmarks |
-| US Sectors | XLE, XLF, XLV, XLU, XLI, XLK, XLP, XLRE | Sector rotation |
-| International | EFA, EEM, FXI, EWZ, EWJ, VGK, **EIS** | Global + Israel |
-| Fixed Income | TLT, IEF, SHY, LQD, HYG, EMB, TIP, GOVT | Duration / safe-haven |
-| Commodities | GLD, SLV, GDX, USO, DBA, DBC, PDBC, VNQ | Inflation / geopolitical |
-| Currencies | UUP, FXE, FXY | Dollar / risk sentiment |
-| Vol & Defense | VIXY, ITA, XAR | Tail risk / defense sector |
-| Crypto | **BITO** (Oct 2021+), **IBIT** (Jan 2024+) | Digital assets |
+| Category | Tickers | Count |
+|----------|---------|-------|
+| US Equity & Value | SPY, QQQ, IWM, DIA, SCHD, VTV | 6 |
+| US Sectors | XLE, XLF, XLV, XLU, XLI, XLK, XLP, XLRE, RSPN | 9 |
+| International | EFA, EEM, FXI, EWZ, EWJ, VGK, CQQQ, VYMI | 8 |
+| Country ETFs | EIS, INDA, EIDO, GREK, EWI, EWN, EWG, EWU, EWW, COLO, ECH, ARGT, EWY, VNM, THD, EWS, EWT, EWA | 18 |
+| Fixed Income | TLT, IEF, SHY, LQD, HYG, EMB, TIP, GOVT | 8 |
+| Commodities | GLD, SLV, GDX, USO, DBA, DBC, PDBC, VNQ, COPX, URA | 10 |
+| FX & Volatility | UUP, FXE, FXY, VIXY | 4 |
+| Thematic & Defense | ITA, XAR, QTUM, BLOK, DRNZ, AIPO | 6 |
+| Global X Thematic | BOTZ, LIT, DRIV, SOCL, CLOU, BUG, AIQ, HERO, PAVE, KRMA, FINX, SNSR, EBIZ, GNOM, DTCR, SHLD | 16 |
+| Managed Futures | DBMF, KMLM, CTA, WTMF | 4 |
+| Crypto | BITO, IBIT | 2 |
 
 ## Quick Start
 
@@ -131,36 +143,77 @@ The full research report is available at [`outputs/final_report.pdf`](outputs/fi
 
 ## Roadmap
 
-### Phase 4: Statistical Robustness (Next Priority)
+> See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
-The findings are descriptive and the measurements are valid, but any prospective use requires rigorous validation.
+### Phase 3.5: Baseline Comparisons & Validation (v0.2.0 — Completed)
 
-#### 4.1 Walk-Forward Validation
-- [ ] Split: train on 2019-2022, test on 2023-2024. Re-train on 2019-2024, test on 2025-2026
-- [ ] Does cross-layer Granger causality (tail -> Pearson CMI) hold out of sample?
-- [ ] Does the topology crystallization pattern (restructuring before the event) replicate?
-- [ ] Track false positive rate of early warning signals in the test set
+#### 3.5.1 K-Means Baseline
+- [x] K-Means clustering on same rolling windows as Leiden (`src/clustering/kmeans.py`)
+- [x] Per-window CMI comparison (K-Means vs Leiden)
+- [x] Cross-method agreement metrics (ARI, NMI, silhouette)
+- [x] Event-window summary table (pre / event / post aggregation)
+- [ ] Generate side-by-side figures for paper (run `rolling_kmeans_baseline` on full dataset)
 
-#### 4.2 Bootstrap & Confidence Intervals
-- [ ] Resample rolling windows 1,000x, recompute TE rankings each time
-- [ ] Are leaders/followers stable or noise? Publish confidence bands
-- [ ] Bootstrap the cross-layer Granger F-statistic to verify p=0.041 is robust
+#### 3.5.2 Out-of-Sample Regime Validation
+- [x] Forward-chaining TimeSeriesSplit validation (`src/regimes/validation.py`)
+- [x] Topology metrics → regime prediction with constrained RF (no overfitting)
+- [x] Per-fold accuracy + macro-F1 reporting
+- [x] Feature importance ranking (which topology metrics matter most)
+- [ ] Run validation on full dataset and document results
 
-#### 4.3 Sensitivity Analysis
-- [ ] Window size: 90 / 120 / 150 / 180 days — do findings survive?
-- [ ] Top-k threshold: 3 / 5 / 7 / 10 neighbors — does cluster structure change?
-- [ ] Leiden resolution: 0.5 to 2.0 sweep — are community assignments stable?
-- [ ] Tail quantile: 1% / 5% / 10% — how sensitive is tail dependence?
+#### 3.5.3 Removed
+- [x] ~~Supervised Gradient Boosting predictive layer~~ — removed (out of scope for descriptive research; reserved for future real-time forecasting extension)
 
-#### 4.4 Multiple Testing Correction
-- [ ] Apply Bonferroni and Benjamini-Hochberg FDR to all 1,560 Granger pairs
-- [ ] Re-assess which individual causal links survive correction
-- [ ] Note: 1,189/1,560 significant at p<0.05 means the aggregate picture is real, but individual pairs need scrutiny
+### Phase 4: Statistical Robustness (v0.4.0 — Completed)
 
-#### 4.5 Small-Sample Robustness
-- [ ] Regime-conditional TE uses small sub-samples (Twelve-Day War = ~8 trading days feeding windows)
-- [ ] Apply block bootstrap preserving temporal structure
-- [ ] Consider surrogate data testing (shuffle time series, recompute TE, compare to observed)
+Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGELOG.md) for full details.
+
+#### 4.0 Methodological Audit & Fixes
+- [x] CMI permutation invariance — Hungarian algorithm for cluster label matching (`migration/metrics.py`)
+- [x] TDS component z-score normalization — `TDSNormalizer` class for commensurable combination
+- [x] TDS spectral distance — Wasserstein on Laplacian spectra (replaces zero-padded L2)
+- [x] CPS bidirectional matching — Hungarian-based instead of greedy best-Jaccard
+- [x] MST weight double-counting fix (`graphs/construction.py`)
+- [x] Granger Bonferroni across lags + ADF stationarity pre-check (`features/lead_lag.py`)
+- [x] PELT penalty fix — proper BIC: `d * log(n)` (`regimes/changepoint.py`)
+
+#### 4.1 Walk-Forward Validation (`src/robustness/walk_forward.py`)
+- [x] Split: train on 2019-2022, test on 2023-2024. Re-train on 2019-2024, test on 2025-2026
+- [x] Cross-layer Granger causality (tail -> Pearson CMI) OOS replication test
+- [x] Topology crystallization pattern replication (restructuring before events)
+- [x] Early warning signal detection with false positive rate tracking
+- [ ] Run on full dataset and document results
+
+#### 4.2 Bootstrap & Confidence Intervals (`src/robustness/bootstrap.py`)
+- [x] Block bootstrap (Politis & Romano 1992) with configurable block size
+- [x] Generic `bootstrap_metric()` for any scalar metric CI
+- [x] `bootstrap_te_rankings()`: TE leadership stability across 1000 resamples
+- [x] `bootstrap_granger_f_stat()`: cross-layer Granger F-stat robustness
+- [ ] Run on full dataset and publish confidence bands
+
+#### 4.3 Sensitivity Analysis (`src/robustness/sensitivity.py`)
+- [x] Window size sweep: 60, 90, 120, 150, 180, 252 days
+- [x] Top-k threshold sweep: 3, 5, 7, 10 edges per node
+- [x] Leiden resolution sweep: 0.3, 0.5, 0.7, 1.0, 1.3, 1.5, 2.0
+- [x] Tail quantile sweep: 0.01, 0.03, 0.05, 0.10
+- [x] Automatic stability assessment (ROBUST / MODERATE / SENSITIVE)
+- [ ] Run on full dataset and document parameter stability
+
+#### 4.4 Multiple Testing Correction (`src/robustness/multiple_testing.py`)
+- [x] Bonferroni correction (FWER control)
+- [x] Benjamini-Hochberg FDR
+- [x] Storey's q-value (adaptive FDR with pi_0 estimation)
+- [x] Aggregate binomial test (more significant pairs than chance?)
+- [x] `summarize_corrections()` for publication-ready comparison table
+- [ ] Run on full Granger matrix (8,190 pairs at 91 assets) and document survival rate
+
+#### 4.5 Small-Sample Robustness (`src/robustness/surrogate_testing.py`)
+- [x] Phase-randomized surrogates (Theiler et al. 1992) — preserves power spectrum
+- [x] IAAFT surrogates (Schreiber & Schmitz 1996) — preserves spectrum + distribution
+- [x] Surrogate TE significance test (null: TE from autocorrelation alone)
+- [x] Stationary block bootstrap (Politis & Romano 1994) — geometric block lengths
+- [x] Monte Carlo minimum sample size estimation (power analysis)
+- [ ] Run surrogate tests on regime-conditional TE and document results
 
 ### Phase 5: Real-Time Extension
 
@@ -199,7 +252,7 @@ For researchers looking to extend this work, here is the recommended logical wor
 
 ```
 1. FOUNDATION (Completed)
-   ├── Multi-asset universe construction (43 ETFs, 7 years)
+   ├── Multi-asset universe construction (91 ETFs, 7 years)
    ├── Rolling-window similarity computation (3 layers)
    ├── Community detection + migration tracking (CMI, TDS, AMF)
    └── Baseline event studies (COVID, Iran-Israel)
@@ -216,13 +269,14 @@ For researchers looking to extend this work, here is the recommended logical wor
    ├── Regime-conditional leadership reversal
    └── Cross-layer Granger causality (key discovery)
 
-4. STATISTICAL ROBUSTNESS (Next Priority)
-   ├── Walk-forward validation (train 2019-2022, test 2023-2026)
-   ├── Bootstrap confidence intervals on TE rankings (1,000 resamples)
-   ├── Sensitivity sweep: window size, top-k, resolution, tail quantile
-   ├── Multiple testing correction (Bonferroni, FDR on 1,560 Granger pairs)
-   ├── Small-sample robustness: block bootstrap, surrogate data testing
-   └── Alternative clustering (Infomap, SBM) as cross-validation of Leiden
+4. STATISTICAL ROBUSTNESS (Framework Complete — v0.4.0)
+   ├── Methodological audit: fixed CMI permutation invariance, TDS scaling, Granger corrections
+   ├── Walk-forward validation (train 2019-2022/test 2023-2024, expand + retest)
+   ├── Block bootstrap confidence intervals (Politis & Romano 1992)
+   ├── Sensitivity sweeps: window size, top-k, resolution, tail quantile
+   ├── Multiple testing correction: Bonferroni, BH-FDR, Storey q-value
+   ├── Surrogate data testing: phase-randomized + IAAFT null distributions
+   └── Monte Carlo power analysis for minimum sample size estimation
 
 5. REAL-TIME EXTENSION
    ├── Streaming data pipeline + incremental rolling window

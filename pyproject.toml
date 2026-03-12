@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "asset-cluster-migration"
-version = "0.1.0"
+version = "0.4.0"
 description = "Dynamic multi-layer asset topology and cluster migration under geopolitical stress"
 readme = "README.md"
 license = "MIT"

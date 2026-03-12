@@ -1,10 +1,18 @@
-"""Lead-lag, transfer entropy, and Granger causality computation."""
+"""Lead-lag, transfer entropy, and Granger causality computation.
+
+v0.4.0 — Added ADF stationarity pre-check for Granger causality,
+Bonferroni correction across lags, and significance flagging.
+"""
 from __future__ import annotations
+
+import logging
 
 import numpy as np
 import pandas as pd
 from scipy.special import digamma
 from sklearn.neighbors import KDTree
+
+logger = logging.getLogger(__name__)
 
 
 def cross_correlation_matrix(
@@ -95,9 +103,18 @@ def transfer_entropy_pair(
         tree_xz = KDTree(xz, metric="chebyshev")
         tree_z = KDTree(z, metric="chebyshev")
 
-        n_yz = np.array([tree_yz.query_radius(yz[i:i+1], r=eps[i], count_only=True)[0] - 1 for i in range(n)])
-        n_xz = np.array([tree_xz.query_radius(xz[i:i+1], r=eps[i], count_only=True)[0] - 1 for i in range(n)])
-        n_z = np.array([tree_z.query_radius(z[i:i+1], r=eps[i], count_only=True)[0] - 1 for i in range(n)])
+        n_yz = np.array([
+            tree_yz.query_radius(yz[i:i+1], r=eps[i], count_only=True)[0] - 1
+            for i in range(n)
+        ])
+        n_xz = np.array([
+            tree_xz.query_radius(xz[i:i+1], r=eps[i], count_only=True)[0] - 1
+            for i in range(n)
+        ])
+        n_z = np.array([
+            tree_z.query_radius(z[i:i+1], r=eps[i], count_only=True)[0] - 1
+            for i in range(n)
+        ])
 
         # Avoid log(0)
         n_yz = np.maximum(n_yz, 1)
@@ -105,6 +122,8 @@ def transfer_entropy_pair(
         n_z = np.maximum(n_z, 1)
 
         te = digamma(k) - np.mean(digamma(n_xz) + digamma(n_yz) - digamma(n_z))
+        if te < 0:
+            logger.debug("Negative TE estimate (bias indicator), clipping to 0")
         return max(te, 0.0)  # TE is non-negative
     except Exception:
         return 0.0
@@ -141,16 +160,36 @@ def net_transfer_entropy(te_matrix: pd.DataFrame) -> pd.DataFrame:
     return te_matrix - te_matrix.T
 
 
+def _check_stationarity(series: np.ndarray, significance: float = 0.05) -> bool:
+    """Check stationarity via Augmented Dickey-Fuller test.
+
+    Returns True if series is stationary at the given significance level.
+    """
+    from statsmodels.tsa.stattools import adfuller
+
+    try:
+        result = adfuller(series, autolag="AIC")
+        return result[1] < significance  # p-value < alpha => stationary
+    except Exception:
+        return False
+
+
 def granger_causality_matrix(
     returns: pd.DataFrame,
     max_lag: int = 5,
     significance: float = 0.05,
+    check_stationarity: bool = True,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Pairwise Granger causality test.
 
+    Improvements over v0.3:
+    - ADF stationarity pre-check (Granger requires stationary series)
+    - Bonferroni correction across lags (avoids min-p-value cherry-picking)
+    - Non-stationary pairs flagged with p=1.0
+
     Returns:
         f_stat_matrix: F-statistics for each pair
-        pvalue_matrix: p-values for each pair
+        pvalue_matrix: Bonferroni-corrected p-values for each pair
     """
     from statsmodels.tsa.stattools import grangercausalitytests
 
@@ -159,10 +198,31 @@ def granger_causality_matrix(
     f_stats = np.zeros((n, n))
     p_values = np.ones((n, n))
 
+    # Pre-check stationarity
+    stationary_mask = np.ones(n, dtype=bool)
+    if check_stationarity:
+        for i in range(n):
+            series_i = returns.iloc[:, i].dropna().values
+            if len(series_i) > 20 and not _check_stationarity(series_i):
+                stationary_mask[i] = False
+                logger.debug(
+                    f"{labels[i]}: non-stationary (ADF p > {significance}), "
+                    "Granger results unreliable"
+                )
+
+    n_stationary_skipped = (~stationary_mask).sum()
+    if n_stationary_skipped > 0:
+        logger.info(
+            f"Granger: {n_stationary_skipped}/{n} series non-stationary "
+            "(results flagged p=1.0)"
+        )
+
     for i in range(n):
         for j in range(n):
             if i == j:
                 continue
+            # Flag non-stationary pairs but don't skip them entirely
+            # (log returns should be stationary — if not, it's informative)
             try:
                 data = pd.DataFrame({
                     "target": returns.iloc[:, j].values,
@@ -171,11 +231,29 @@ def granger_causality_matrix(
                 data = data.dropna()
                 if len(data) < max_lag + 10:
                     continue
-                result = grangercausalitytests(data[["target", "source"]], maxlag=max_lag, verbose=False)
-                # Take minimum p-value across lags
-                best_lag = min(result.keys(), key=lambda l: result[l][0]["ssr_ftest"][1])
-                f_stats[i, j] = result[best_lag][0]["ssr_ftest"][0]
-                p_values[i, j] = result[best_lag][0]["ssr_ftest"][1]
+
+                result = grangercausalitytests(
+                    data[["target", "source"]], maxlag=max_lag, verbose=False
+                )
+
+                # Bonferroni correction: multiply each p-value by number of
+                # lags tested, then take the best corrected p-value
+                best_f = 0.0
+                best_p = 1.0
+                for lag_val in result:
+                    raw_p = result[lag_val][0]["ssr_ftest"][1]
+                    corrected_p = min(raw_p * max_lag, 1.0)  # Bonferroni
+                    if corrected_p < best_p:
+                        best_p = corrected_p
+                        best_f = result[lag_val][0]["ssr_ftest"][0]
+
+                f_stats[i, j] = best_f
+                p_values[i, j] = best_p
+
+                # Flag non-stationary pairs
+                if not (stationary_mask[i] and stationary_mask[j]):
+                    p_values[i, j] = 1.0
+
             except Exception:
                 pass
 
