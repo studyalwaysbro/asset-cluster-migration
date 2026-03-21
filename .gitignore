@@ -11,6 +11,7 @@ __pycache__/
 dist/
 build/
 *.egg
+.venv/
 
 # Data (raw data gitignored, processed snapshots tracked if small)
 data/raw/
@@ -44,3 +45,10 @@ _write_doc.py
 
 # Claude Code
 .claude/
+
+# Virtual env & logs
+logs/
+notebooks/
+*.npy
+_w.py
+.pre-commit-config.yaml

@@ -53,4 +53,4 @@ missing_data:
   max_missing_pct: 0.05  # Exclude assets with > 5% missing
 
 data:
-  min_inception_date: "2019-01-01"
+  min_inception_date: "2010-01-01"

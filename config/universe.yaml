@@ -1,8 +1,10 @@
 # Asset Universe Definition
-# Expanded: 91 diversified ETFs across 13 groups
+# Expanded: 100+ diversified ETFs across 14 groups
+# Updated 2026-03-21: pushed start to 2010 for more regime diversity,
+# added missing GICS sectors, semis, total market, value/income factors
 
 data_source: fmp
-start_date: "2019-01-01"
+start_date: "2010-01-01"
 end_date: null  # null = always extend to most recent trading day
 frequency: daily
 
@@ -12,6 +14,7 @@ assets:
     - {ticker: QQQ, name: "Nasdaq 100", category: equity_us}
     - {ticker: IWM, name: "Russell 2000", category: equity_us}
     - {ticker: DIA, name: "Dow Jones", category: equity_us}
+    - {ticker: VTI, name: "Total US Market", category: equity_us}
 
   us_sectors:
     - {ticker: XLE, name: "Energy", category: sector}
@@ -21,8 +24,12 @@ assets:
     - {ticker: XLI, name: "Industrials", category: sector}
     - {ticker: XLK, name: "Technology", category: sector}
     - {ticker: XLP, name: "Staples", category: sector}
-    - {ticker: XLRE, name: "Real Estate", category: sector}
+    - {ticker: XLY, name: "Consumer Discretionary", category: sector}
+    - {ticker: XLB, name: "Materials", category: sector}
+    - {ticker: XLC, name: "Communication Services", category: sector, inception: "2018-06-18"}
+    - {ticker: XLRE, name: "Real Estate", category: sector, inception: "2015-10-07"}
     - {ticker: RSPN, name: "Equal Weight Industrials", category: sector}
+    - {ticker: SOXX, name: "Semiconductors", category: sector}
 
   international:
     - {ticker: EFA, name: "MSCI EAFE", category: equity_intl}
@@ -85,8 +92,9 @@ assets:
     - {ticker: BITO, name: "Bitcoin Strategy", category: crypto, inception: "2021-10-19"}
     - {ticker: QTUM, name: "Quantum Computing & AI", category: thematic}
     - {ticker: BLOK, name: "Blockchain", category: thematic}
-    - {ticker: DRNZ, name: "Drone Technology", category: thematic, inception: "2025-10-01"}
-    - {ticker: AIPO, name: "AI & Power Infrastructure", category: thematic, inception: "2025-07-01"}
+    # WATCH LIST — insufficient history for reliable clustering (< 18 months)
+    # - {ticker: DRNZ, name: "Drone Technology", category: thematic, inception: "2025-10-01"}
+    # - {ticker: AIPO, name: "AI & Power Infrastructure", category: thematic, inception: "2025-07-01"}
 
   global_x_thematic:
     - {ticker: BOTZ, name: "Robotics & AI", category: thematic}
@@ -110,6 +118,8 @@ assets:
     - {ticker: SCHD, name: "US Dividend Equity", category: equity_us}
     - {ticker: VTV, name: "US Large-Cap Value", category: equity_us}
     - {ticker: VYMI, name: "Intl High Dividend", category: equity_intl}
+    - {ticker: JEPI, name: "Equity Premium Income", category: equity_us, inception: "2020-05-20"}
+    - {ticker: COWZ, name: "Cash Cow Value", category: equity_us, inception: "2016-12-16"}
 
   managed_futures:
     - {ticker: DBMF, name: "Managed Futures Strategy", category: alternatives, inception: "2019-05-01"}

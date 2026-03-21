@@ -60,21 +60,119 @@ events:
       - "Q3 earnings season"
       - "Nasrallah assassination Sep 27 (related escalation)"
 
-  # Phase 2 event studies
-  # svb_banking_stress:
-  #   name: "SVB Banking Stress March 2023"
-  #   pre_start: "2022-12-01"
-  #   pre_end: "2023-03-08"
-  #   event_start: "2023-03-09"
-  #   event_end: "2023-04-14"
-  #   post_start: "2023-04-15"
-  #   post_end: "2023-06-30"
+  svb_banking_stress:
+    name: "SVB Banking Stress March 2023"
+    description: "Silicon Valley Bank collapse triggered regional banking crisis. Contagion to Signature Bank, First Republic. Fed launched BTFP emergency facility."
+    pre_start: "2022-12-01"
+    pre_end: "2023-03-08"
+    event_start: "2023-03-09"
+    event_end: "2023-04-14"
+    post_start: "2023-04-15"
+    post_end: "2023-06-30"
+    peak_stress_date: "2023-03-13"
+    sub_windows:
+      pre_calm: ["2023-02-01", "2023-03-08"]
+      acute_shock: ["2023-03-09", "2023-03-15"]
+      contagion: ["2023-03-16", "2023-03-24"]
+      fed_backstop: ["2023-03-25", "2023-04-14"]
+      normalization: ["2023-04-15", "2023-05-31"]
+    confounders:
+      - "FOMC meeting March 22 (25bp hike despite stress)"
+      - "Credit Suisse failure March 19 (related contagion)"
 
-  # fed_repricing_2022:
-  #   name: "Fed Hawkish Repricing 2022"
-  #   pre_start: "2021-09-01"
-  #   pre_end: "2021-12-31"
-  #   event_start: "2022-01-01"
-  #   event_end: "2022-06-30"
-  #   post_start: "2022-07-01"
-  #   post_end: "2022-09-30"
+  fed_repricing_2022:
+    name: "Fed Hawkish Repricing 2022"
+    description: "Most aggressive Fed tightening cycle since Volcker. 425bp of hikes in 2022 alone. Duration massacre across bonds and growth equities."
+    pre_start: "2021-09-01"
+    pre_end: "2021-12-31"
+    event_start: "2022-01-01"
+    event_end: "2022-06-30"
+    post_start: "2022-07-01"
+    post_end: "2022-09-30"
+    peak_stress_date: "2022-06-16"
+    sub_windows:
+      pre_taper: ["2021-11-01", "2021-12-31"]
+      rate_shock: ["2022-01-03", "2022-03-15"]
+      acceleration: ["2022-03-16", "2022-06-15"]
+      bear_market: ["2022-06-16", "2022-09-30"]
+    confounders:
+      - "Russia-Ukraine war Feb 24 (commodity/energy supply shock)"
+      - "China zero-COVID lockdowns (supply chain disruption)"
+
+  japan_carry_unwind_2024:
+    name: "Japan Carry Trade Unwind August 2024"
+    description: "BOJ rate hike triggered massive yen carry trade unwind. Nikkei -12% single day (worst since 1987). Global equity flash crash."
+    pre_start: "2024-06-01"
+    pre_end: "2024-07-30"
+    event_start: "2024-07-31"
+    event_end: "2024-08-16"
+    post_start: "2024-08-17"
+    post_end: "2024-09-30"
+    peak_stress_date: "2024-08-05"
+    sub_windows:
+      boj_hike: ["2024-07-31", "2024-08-01"]
+      acute_crash: ["2024-08-02", "2024-08-05"]
+      recovery: ["2024-08-06", "2024-08-16"]
+      normalization: ["2024-08-17", "2024-09-15"]
+    confounders:
+      - "Weak US payrolls Aug 2 (recession fear catalyst)"
+      - "Sahm Rule triggered (recession indicator)"
+
+  deepseek_ai_shock_2025:
+    name: "DeepSeek AI Cost Shock January 2025"
+    description: "DeepSeek R1 release showed competitive LLM at fraction of US cost. NVDA -17% single day ($600B market cap loss). Questioned AI capex thesis."
+    pre_start: "2024-12-01"
+    pre_end: "2025-01-24"
+    event_start: "2025-01-25"
+    event_end: "2025-02-14"
+    post_start: "2025-02-15"
+    post_end: "2025-03-15"
+    peak_stress_date: "2025-01-27"
+    sub_windows:
+      pre_euphoria: ["2025-01-06", "2025-01-24"]
+      acute_shock: ["2025-01-25", "2025-01-28"]
+      reassessment: ["2025-01-29", "2025-02-07"]
+      normalization: ["2025-02-08", "2025-02-28"]
+    confounders:
+      - "Trump tariff escalation (overlapping macro uncertainty)"
+      - "Q4 2024 earnings season in progress"
+
+  covid_crash_2020:
+    name: "COVID-19 Market Crash February-March 2020"
+    description: "Fastest bear market in history. S&P -34% in 23 trading days. Fed cut to zero, unlimited QE. Unprecedented correlation spike."
+    pre_start: "2019-10-01"
+    pre_end: "2020-02-19"
+    event_start: "2020-02-20"
+    event_end: "2020-04-07"
+    post_start: "2020-04-08"
+    post_end: "2020-06-30"
+    peak_stress_date: "2020-03-23"
+    sub_windows:
+      pre_calm: ["2020-01-15", "2020-02-19"]
+      initial_selloff: ["2020-02-20", "2020-03-06"]
+      acute_panic: ["2020-03-07", "2020-03-23"]
+      fed_bazooka: ["2020-03-24", "2020-04-07"]
+      recovery: ["2020-04-08", "2020-05-31"]
+    confounders:
+      - "Oil price war (Saudi-Russia) March 8"
+      - "Treasury market illiquidity crisis"
+
+  eu_debt_crisis_2011:
+    name: "European Sovereign Debt Crisis & US Downgrade 2011"
+    description: "Greek default fears, US credit downgrade by S&P, Italian/Spanish spreads blowout. S&P -19% in 3 weeks."
+    pre_start: "2011-04-01"
+    pre_end: "2011-07-21"
+    event_start: "2011-07-22"
+    event_end: "2011-10-03"
+    post_start: "2011-10-04"
+    post_end: "2011-12-31"
+    peak_stress_date: "2011-08-08"
+    sub_windows:
+      pre_escalation: ["2011-06-15", "2011-07-21"]
+      acute_shock: ["2011-07-22", "2011-08-12"]
+      us_downgrade: ["2011-08-05", "2011-08-08"]
+      contagion: ["2011-08-13", "2011-09-22"]
+      ecb_response: ["2011-09-23", "2011-10-27"]
+    confounders:
+      - "US debt ceiling standoff July 2011"
+      - "Japan earthquake/tsunami aftermath (March 2011)"
