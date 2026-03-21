@@ -1,0 +1,56 @@
+# Methodology Hyperparameters
+
+rolling_windows:
+  window_sizes: [60, 120, 252]
+  step_size: 5
+  min_periods: 60
+  primary_window: 120
+
+ewma:
+  half_lives: [21, 63]
+
+similarity:
+  layers:
+    - pearson_shrinkage
+    - spearman
+    - distance_correlation
+    - mutual_information
+    - tail_dependence
+  tail_quantile: 0.05
+  mi_k_neighbors: 5
+
+graph:
+  filtering_method: threshold  # threshold, mst, pmfg
+  top_k_edges: 5
+  mst_enabled: true
+  pmfg_enabled: true
+
+clustering:
+  primary_method: leiden
+  leiden_resolution: 1.0
+  spectral_max_clusters: 10
+  consensus_n_runs: 100
+  consensus_resolution_range: [0.5, 2.0]
+
+regimes:
+  n_regimes: 3
+  hmm_n_iter: 100
+  hmm_covariance_type: full
+  changepoint_model: rbf
+  changepoint_penalty: null  # null = BIC auto-select
+
+migration:
+  tds_weights: [0.333, 0.333, 0.334]  # [wasserstein, nmi, spectral]
+
+seeds:
+  clustering: 42
+  hmm: 42
+  consensus: 42
+  bootstrap: 42
+
+missing_data:
+  max_forward_fill_days: 5
+  max_missing_pct: 0.05  # Exclude assets with > 5% missing
+
+data:
+  min_inception_date: "2010-01-01"

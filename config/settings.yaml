@@ -1,0 +1,23 @@
+# Project Settings (non-secret)
+
+project:
+  name: asset-cluster-migration
+  version: 0.1.0
+
+fmp:
+  base_url: "https://financialmodelingprep.com/api/v3"
+  base_url_v4: "https://financialmodelingprep.com/api/v4"
+  max_calls_per_minute: 2500  # Safe margin under 3000 limit
+  max_bandwidth_gb: 140  # Safe margin under 150GB limit
+  retry_max_attempts: 3
+  retry_backoff_factor: 2
+
+cache:
+  enabled: true
+  directory: data/raw
+  format: parquet
+
+output:
+  figures_dir: outputs/figures
+  tables_dir: outputs/tables
+  reports_dir: outputs/reports

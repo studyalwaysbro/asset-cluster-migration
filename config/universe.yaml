@@ -1,0 +1,133 @@
+# Asset Universe Definition
+# Expanded: 100+ diversified ETFs across 14 groups
+# Updated 2026-03-21: pushed start to 2010 for more regime diversity,
+# added missing GICS sectors, semis, total market, value/income factors
+
+data_source: fmp
+start_date: "2010-01-01"
+end_date: null  # null = always extend to most recent trading day
+frequency: daily
+
+assets:
+  us_equity_benchmarks:
+    - {ticker: SPY, name: "S&P 500", category: equity_us}
+    - {ticker: QQQ, name: "Nasdaq 100", category: equity_us}
+    - {ticker: IWM, name: "Russell 2000", category: equity_us}
+    - {ticker: DIA, name: "Dow Jones", category: equity_us}
+    - {ticker: VTI, name: "Total US Market", category: equity_us}
+
+  us_sectors:
+    - {ticker: XLE, name: "Energy", category: sector}
+    - {ticker: XLF, name: "Financials", category: sector}
+    - {ticker: XLV, name: "Health Care", category: sector}
+    - {ticker: XLU, name: "Utilities", category: sector}
+    - {ticker: XLI, name: "Industrials", category: sector}
+    - {ticker: XLK, name: "Technology", category: sector}
+    - {ticker: XLP, name: "Staples", category: sector}
+    - {ticker: XLY, name: "Consumer Discretionary", category: sector}
+    - {ticker: XLB, name: "Materials", category: sector}
+    - {ticker: XLC, name: "Communication Services", category: sector, inception: "2018-06-18"}
+    - {ticker: XLRE, name: "Real Estate", category: sector, inception: "2015-10-07"}
+    - {ticker: RSPN, name: "Equal Weight Industrials", category: sector}
+    - {ticker: SOXX, name: "Semiconductors", category: sector}
+
+  international:
+    - {ticker: EFA, name: "MSCI EAFE", category: equity_intl}
+    - {ticker: EEM, name: "MSCI EM", category: equity_em}
+    - {ticker: FXI, name: "China Large-Cap", category: equity_em}
+    - {ticker: EWZ, name: "Brazil", category: equity_em}
+    - {ticker: EWJ, name: "Japan", category: equity_intl}
+    - {ticker: VGK, name: "Europe", category: equity_intl}
+    - {ticker: CQQQ, name: "China Technology", category: equity_em}
+
+  country_etfs:
+    - {ticker: EIS, name: "Israel", category: equity_intl}
+    - {ticker: INDA, name: "India", category: equity_em}
+    - {ticker: EIDO, name: "Indonesia", category: equity_em}
+    - {ticker: GREK, name: "Greece", category: equity_intl}
+    - {ticker: EWI, name: "Italy", category: equity_intl}
+    - {ticker: EWN, name: "Netherlands", category: equity_intl}
+    - {ticker: EWG, name: "Germany", category: equity_intl}
+    - {ticker: EWU, name: "United Kingdom", category: equity_intl}
+    - {ticker: EWW, name: "Mexico", category: equity_em}
+    - {ticker: COLO, name: "Colombia", category: equity_em}
+    - {ticker: ECH, name: "Chile", category: equity_em}
+    - {ticker: ARGT, name: "Argentina", category: equity_em}
+    - {ticker: EWY, name: "South Korea", category: equity_intl}
+    - {ticker: VNM, name: "Vietnam", category: equity_em}
+    - {ticker: THD, name: "Thailand", category: equity_em}
+    - {ticker: EWS, name: "Singapore", category: equity_intl}
+    - {ticker: EWT, name: "Taiwan", category: equity_intl}
+    - {ticker: EWA, name: "Australia", category: equity_intl}
+
+  fixed_income:
+    - {ticker: TLT, name: "20+ Yr Treasury", category: bond_govt}
+    - {ticker: IEF, name: "7-10 Yr Treasury", category: bond_govt}
+    - {ticker: SHY, name: "1-3 Yr Treasury", category: bond_govt}
+    - {ticker: LQD, name: "IG Corp", category: bond_credit}
+    - {ticker: HYG, name: "High Yield", category: bond_credit}
+    - {ticker: EMB, name: "EM Bonds", category: bond_em}
+
+  commodities:
+    - {ticker: GLD, name: "Gold", category: commodity}
+    - {ticker: SLV, name: "Silver", category: commodity}
+    - {ticker: GDX, name: "Gold Miners", category: commodity}
+    - {ticker: USO, name: "Crude Oil", category: commodity}
+    - {ticker: DBA, name: "Agriculture", category: commodity}
+    - {ticker: DBC, name: "Broad Commodities", category: commodity}
+    - {ticker: VNQ, name: "Real Estate REIT", category: real_asset}
+    - {ticker: COPX, name: "Copper Miners", category: commodity}
+    - {ticker: URA, name: "Uranium", category: commodity}
+
+  fx_volatility:
+    - {ticker: UUP, name: "Dollar Bull", category: fx}
+    - {ticker: FXE, name: "Euro", category: fx}
+    - {ticker: FXY, name: "Yen", category: fx}
+    - {ticker: VIXY, name: "VIX Short-Term", category: volatility}
+
+  thematic:
+    - {ticker: ITA, name: "Aerospace Defense", category: thematic}
+    - {ticker: XAR, name: "S&P Aero Defense", category: thematic}
+    - {ticker: IBIT, name: "Bitcoin Trust", category: crypto, inception: "2024-01-11"}
+    - {ticker: BITO, name: "Bitcoin Strategy", category: crypto, inception: "2021-10-19"}
+    - {ticker: QTUM, name: "Quantum Computing & AI", category: thematic}
+    - {ticker: BLOK, name: "Blockchain", category: thematic}
+    # WATCH LIST — insufficient history for reliable clustering (< 18 months)
+    # - {ticker: DRNZ, name: "Drone Technology", category: thematic, inception: "2025-10-01"}
+    # - {ticker: AIPO, name: "AI & Power Infrastructure", category: thematic, inception: "2025-07-01"}
+
+  global_x_thematic:
+    - {ticker: BOTZ, name: "Robotics & AI", category: thematic}
+    - {ticker: LIT, name: "Lithium & Battery Tech", category: thematic}
+    - {ticker: DRIV, name: "Autonomous & EV", category: thematic}
+    - {ticker: SOCL, name: "Social Media", category: thematic}
+    - {ticker: CLOU, name: "Cloud Computing", category: thematic}
+    - {ticker: BUG, name: "Cybersecurity", category: thematic}
+    - {ticker: AIQ, name: "AI & Big Data", category: thematic}
+    - {ticker: HERO, name: "Video Games & Esports", category: thematic}
+    - {ticker: PAVE, name: "US Infrastructure", category: thematic}
+    - {ticker: KRMA, name: "Conscious Companies", category: thematic}
+    - {ticker: FINX, name: "FinTech", category: thematic}
+    - {ticker: SNSR, name: "Internet of Things", category: thematic}
+    - {ticker: EBIZ, name: "E-Commerce", category: thematic}
+    - {ticker: GNOM, name: "Genomics & Biotech", category: thematic}
+    - {ticker: DTCR, name: "Data Center Infrastructure", category: thematic, inception: "2024-06-01"}
+    - {ticker: SHLD, name: "Defense Technology", category: thematic, inception: "2024-03-01"}
+
+  dividend_value:
+    - {ticker: SCHD, name: "US Dividend Equity", category: equity_us}
+    - {ticker: VTV, name: "US Large-Cap Value", category: equity_us}
+    - {ticker: VYMI, name: "Intl High Dividend", category: equity_intl}
+    - {ticker: JEPI, name: "Equity Premium Income", category: equity_us, inception: "2020-05-20"}
+    - {ticker: COWZ, name: "Cash Cow Value", category: equity_us, inception: "2016-12-16"}
+
+  managed_futures:
+    - {ticker: DBMF, name: "Managed Futures Strategy", category: alternatives, inception: "2019-05-01"}
+    - {ticker: KMLM, name: "Mount Lucas Managed Futures", category: alternatives, inception: "2020-12-01"}
+    - {ticker: CTA, name: "Simplify Managed Futures", category: alternatives, inception: "2022-03-01"}
+    - {ticker: WTMF, name: "WisdomTree Managed Futures", category: alternatives}
+
+  alternatives:
+    - {ticker: TIP, name: "TIPS", category: inflation}
+    - {ticker: PDBC, name: "Optimum Yield", category: commodity}
+    - {ticker: GOVT, name: "US Treasury Bond", category: bond_govt}
