@@ -164,11 +164,11 @@ def run_all(
 @app.command()
 def export_topology(
     target_dir: str = typer.Option(
-        "C:/Users/regin/projects/stock-signal-engine/cache/topology",
-        help="Directory to export topology parquets to",
+        None,
+        help="Directory to export topology parquets to (default: TOPOLOGY_EXPORT_DIR env var or data/exports/topology)",
     ),
 ) -> None:
-    """Export topology parquets to stock-signal-engine (standalone)."""
+    """Export topology parquets to an external directory (standalone)."""
     from src.pipeline.steps import step_export_topology
 
     step_export_topology(topology_dir=target_dir)

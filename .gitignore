@@ -52,3 +52,9 @@ notebooks/
 *.npy
 _w.py
 .pre-commit-config.yaml
+
+# Internal workflow docs with local paths
+outputs/PHASE_PROGRESS_REPORT.md
+
+# Topology exports (local only, not tracked)
+data/exports/

@@ -1,5 +1,7 @@
 # Dynamic Multi-Asset Topology and Cluster Migration Under Geopolitical Stress
 
+> **Disclaimer:** This document is produced solely for educational and academic research purposes. Nothing herein constitutes investment advice, a solicitation, or a recommendation to buy, sell, or hold any security or financial instrument. The authors are presenting independent academic research on asset clustering methodologies. Past performance and historical patterns do not guarantee future results.
+
 ## Authors
 
 - **Nicholas Tavares**
@@ -91,7 +93,7 @@ The primary contribution is treating cluster migration as a first-class, measura
 | Data expansion | 2019 → 2010 start date (16 years) | Complete |
 | Universe | +7 ETFs (VTI, XLY, XLB, XLC, SOXX, JEPI, COWZ), -2 (DRNZ, AIPO) | Complete |
 | Event windows | 2 → 8 events (EU 2011, COVID, Fed 2022, SVB, Japan carry, DeepSeek) | Complete |
-| Topology export | 4 parquets to stock-signal-engine for downstream ML | Complete |
+| Topology export | 4 parquets for downstream reproducibility and analysis | Complete |
 | Centrality fix | Disconnected graph eigenvector centrality fallback | Complete |
 
 ### Phase 6: Real-Time Extension (Future)
@@ -605,4 +607,4 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 | v0.2.0 | 2026-03-11 | K-Means baseline, OOS validation, removed predictive.py |
 | v0.3.0 | 2026-03-11 | 91-ETF universe, live data extension, Plotly visualizations |
 | v0.4.0 | 2026-03-11 | Phase 4 robustness framework, 7 critical methodology fixes, 32 tests |
-| v0.5.0 | 2026-03-21 | Phase 5: 8-step CLI orchestrator, 2010 start date (16 years), 96-ETF universe (+7/-2), 8 event windows, topology export to stock-signal-engine, centrality fix |
+| v0.5.0 | 2026-03-21 | Phase 5: 8-step CLI orchestrator, 2010 start date (16 years), 96-ETF universe (+7/-2), 8 event windows, topology parquet export, centrality fix |

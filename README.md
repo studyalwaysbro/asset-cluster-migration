@@ -1,6 +1,6 @@
 # Dynamic Multi-Asset Topology and Cluster Migration Under Geopolitical Stress
 
-> **Disclaimer:** This project is produced solely for educational and academic research purposes. Nothing in this repository constitutes investment advice, a solicitation, or a recommendation to buy, sell, or hold any security or financial instrument. This project is not connected to, endorsed by, or produced in any capacity related to UBS or any broker-dealer. The authors are presenting independent academic research on asset clustering methodologies. Past performance and historical patterns do not guarantee future results.
+> **Disclaimer:** This project is produced solely for educational and academic research purposes. Nothing in this repository constitutes investment advice, a solicitation, or a recommendation to buy, sell, or hold any security or financial instrument. This project is not connected to, endorsed by, or produced in any professional capacity related to any broker-dealer or investment advisory firm. The authors are presenting independent academic research on asset clustering methodologies. Past performance and historical patterns do not guarantee future results.
 
 ## Authors
 
@@ -148,7 +148,7 @@ python -m src.pipeline.orchestrator run-step fetch-data
 python -m src.pipeline.orchestrator run-step run-clustering
 python -m src.pipeline.orchestrator run-step export-topology
 
-# Export topology to stock-signal-engine only
+# Export topology to external analysis cache only
 python -m src.pipeline.orchestrator export-topology
 ```
 
@@ -248,7 +248,7 @@ Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGE
 
 #### 4.6 Pipeline Automation & Integration (v0.5.0 — Completed)
 - [x] Full 8-step pipeline with CLI (fetch, validate, build-features, clustering, regimes, migration, centrality, export-topology)
-- [x] Topology export to stock-signal-engine cache for downstream model consumption
+- [x] Topology export to external analysis cache cache for downstream model consumption
 - [x] Disconnected graph handling for eigenvector centrality
 - [x] Run logging with JSONL summaries
 

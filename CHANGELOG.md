@@ -24,7 +24,7 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `step_run_regimes()`: Fits HMM regime detector (calm/transition/stress) on full returns
 - `step_run_migration()`: Computes CMI, AMF, CPS, TDS metrics per window with graph history
 - `step_compute_centrality()`: Betweenness, eigenvector, degree, closeness per rolling window
-- `step_export_topology()`: Exports 4 parquet files to stock-signal-engine/cache/topology/
+- `step_export_topology()`: Exports 4 parquet files to external cache directory/cache/topology/
 - `run_full_pipeline()`: End-to-end orchestrator calling all 8 steps sequentially
 
 **Pipeline Orchestrator** (`src/pipeline/orchestrator.py`)
@@ -34,12 +34,12 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Run logging with JSONL summaries to `logs/run_summary.jsonl`
 - Persistent file logging with rotation (`logs/pipeline/`)
 
-**Topology Export** (NEW: downstream ML integration)
+**Topology Export** (NEW: topology data export for reproducibility)
 - `cluster_membership.parquet`: 45,076 rows (date, ticker, cluster_id, days_since_migration, cluster_size)
 - `centrality_metrics.parquet`: 45,076 rows (date, ticker, degree, betweenness, eigenvector, closeness)
 - `regime_states.parquet`: 3,918 rows (date, regime, regime_probability, days_in_regime)
 - `topology_deformation.parquet`: 763 rows (date, tds_score, tds_zscore, layer_agreement)
-- Exports to `stock-signal-engine/cache/topology/` for TFT model topology feature consumption
+- Exports to `external cache directory/cache/topology/` for downstream topology analysis
 
 **Event Windows Expansion** (`config/event_windows.yaml`)
 - 2 → 8 geopolitical events with full sub-windows and confounders:

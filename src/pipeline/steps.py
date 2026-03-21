@@ -1,8 +1,8 @@
 """Individual pipeline step implementations.
 
 Each step reads from data/raw or data/processed and writes outputs back.
-The export-topology step writes the 4 parquet files consumed by
-stock-signal-engine/cache/topology/.
+The export-topology step writes 4 parquet files to a configurable
+external cache directory for downstream analysis.
 """
 from __future__ import annotations
 
@@ -356,23 +356,29 @@ def step_compute_centrality(graph_history: list | None = None) -> None:
     logger.info(f"Centrality metrics: {len(records)} rows across {len(graph_history)} windows")
 
 
-# ── Step 8: Export topology to stock-signal-engine ──────────────────────
+# ── Step 8: Export topology parquets ─────────────────────────────────────
 
 def step_export_topology(
     topology_dir: str | Path | None = None,
 ) -> None:
-    """Export the 4 parquet files consumed by stock-signal-engine's TopologyFetcher.
+    """Export 4 topology parquet files to an external cache directory.
 
-    Writes to stock-signal-engine/cache/topology/ (or custom path).
-    Format matches what topology_fetcher.py expects:
+    Writes standardized parquet snapshots of cluster, centrality, regime,
+    and topology deformation data for reproducibility and downstream analysis.
+
+    Files:
       - cluster_membership.parquet: date, ticker, cluster_id, days_since_migration, cluster_size
       - centrality_metrics.parquet: date, ticker, betweenness, eigenvector, degree, closeness
       - regime_states.parquet: date, regime, regime_probability, days_in_regime
       - topology_deformation.parquet: date, tds_score, tds_zscore, layer_agreement
     """
     if topology_dir is None:
-        # Default: sibling project
-        topology_dir = Path("C:/Users/regin/projects/stock-signal-engine/cache/topology")
+        # Default: use TOPOLOGY_EXPORT_DIR env var, or fall back to data/exports/
+        import os
+        topology_dir = Path(os.getenv(
+            "TOPOLOGY_EXPORT_DIR",
+            str(PROJECT_ROOT / "data" / "exports" / "topology"),
+        ))
     else:
         topology_dir = Path(topology_dir)
 
@@ -502,7 +508,7 @@ def run_full_pipeline(export_topology: bool = True) -> None:
     # 7. Compute centrality
     step_compute_centrality(graph_history)
 
-    # 8. Export topology to stock-signal-engine
+    # 8. Export topology parquets
     if export_topology:
         step_export_topology()
 
