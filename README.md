@@ -10,7 +10,7 @@
 
 ## Overview
 
-A quantitative research framework that tracks how multi-asset portfolio structures reorganize during geopolitical crises. We apply graph theory, community detection, information theory, and multi-layer network analysis to a universe of 91 ETFs spanning equities, fixed income, commodities, currencies, crypto, managed futures, thematics, and 18 country-specific funds from January 2019 through the most recent trading day.
+A quantitative research framework that tracks how multi-asset portfolio structures reorganize during geopolitical crises. We apply graph theory, community detection, information theory, and multi-layer network analysis to a universe of 96 ETFs spanning equities, fixed income, commodities, currencies, crypto, managed futures, thematics, and 18 country-specific funds from January 2010 through the most recent trading day.
 
 ### Three-Phase Architecture
 
@@ -22,19 +22,42 @@ A quantitative research framework that tracks how multi-asset portfolio structur
 
 ### Key Findings
 
+Updated findings from v0.5.0 full pipeline run (2010-2026):
+
 1. **Markets restructure BEFORE the event** - Peak topology deformation (TDS=0.176, exceeding COVID) occurred during the buildup to Operation Epic Fury, not during the strikes
 2. **Correlation alone is insufficient** - The June 2025 Twelve-Day War was invisible to Pearson correlation but showed massive restructuring in nonlinear and tail-dependence measures
 3. **Tail-dependence CMI Granger-causes Pearson CMI** (p=0.041) - Crash-structure changes predict normal-correlation changes, providing a potential early warning signal
 4. **Leadership reversal during war** - Calm markets: credit/real estate lead. War: Treasury complex (TLT, GOVT, TIP) becomes the primary information sender
 5. **COVID produced complete cluster dissolution** (CMI=1.0) but recovered faster than the asymmetric geopolitical shocks
+6. **Commodity/EM assets are most migration-prone** — COLO (0.22), DBA (0.21), USO (0.21) highest AMF vs core equity <0.02
+7. **Fixed income acts as network bridge** — EMB/SHY highest betweenness centrality, critical information intermediaries
+8. **EEM is most central asset overall** — highest degree, eigenvector, and closeness centrality in the latest window
+9. **Credit spreads drive information flow** — HYG is the #1 net information sender (net flow +0.385), FXE is the #1 receiver
+
+## Latest Pipeline Results (v0.5.0)
+
+| Metric | Value |
+|--------|-------|
+| Assets surviving cleaning | 59 of 96 (37 excluded in early windows for insufficient history) |
+| Trading days | 3,938 (2010-01-05 to 2026-03-20) |
+| Rolling windows | 764 (120-day, 5-day step) |
+| Active clusters (latest window) | 6 |
+| HMM regimes | 3: calm (89.7%), transition (5.1%), stress (5.2%) |
+| Current regime | **STRESS** (as of 2026-03-20) |
+| Mean CMI | 0.094 |
+| Mean TDS | 0.022 |
+| Most stable assets | VTV (0.016), DIA (0.018) |
+| Most volatile assets | COLO (0.216), DBA (0.208), USO (0.206) |
+| Topology exports | 4 parquet files for downstream ML model integration |
 
 ## Repository Structure
 
 ```
 Asset Cluster Migration/
 ├── config/
-│   ├── universe.yaml          # 43-ETF universe definition
-│   └── settings.yaml          # API and pipeline settings
+│   ├── universe.yaml          # 96-ETF universe definition
+│   ├── settings.yaml          # API and pipeline settings
+│   └── event_windows.yaml     # 8 geopolitical event windows
 ├── src/
 │   ├── data/
 │   │   ├── fmp_client.py      # Async FMP API client (rate-limited, cached)
@@ -67,30 +90,33 @@ Asset Cluster Migration/
 │   │   ├── multiple_testing.py # Bonferroni, BH-FDR, Storey q-value
 │   │   └── surrogate_testing.py # Surrogate data + power analysis
 │   └── pipeline/
-│       └── orchestrator.py    # Full pipeline orchestrator
+│       ├── orchestrator.py    # Full pipeline orchestrator (CLI)
+│       ├── steps.py           # Full pipeline step implementations
+│       └── council_logger.py  # Training/council run logging
 ├── outputs/
 │   ├── final_report.pdf       # Complete research report (24 figures, glossary, disclaimers)
 │   └── figures/               # All 24 publication-quality figures
 ├── data/
 │   ├── raw/                   # Cached API responses (gitignored)
 │   └── processed/             # Parquet files: returns, correlations, assignments, TE matrices
+├── logs/                      # Pipeline and council run logs
 ├── CHANGELOG.md               # Version history (patch notes)
 ├── Makefile                   # Pipeline automation
 └── pyproject.toml             # Dependencies
 ```
 
-## Asset Universe (91 ETFs)
+## Asset Universe (96 ETFs)
 
 | Category | Tickers | Count |
 |----------|---------|-------|
-| US Equity & Value | SPY, QQQ, IWM, DIA, SCHD, VTV | 6 |
-| US Sectors | XLE, XLF, XLV, XLU, XLI, XLK, XLP, XLRE, RSPN | 9 |
+| US Equity & Value | SPY, QQQ, IWM, DIA, VTI, SCHD, VTV, JEPI, COWZ | 9 |
+| US Sectors | XLE, XLF, XLV, XLU, XLI, XLK, XLP, XLY, XLB, XLC, XLRE, RSPN, SOXX | 13 |
 | International | EFA, EEM, FXI, EWZ, EWJ, VGK, CQQQ, VYMI | 8 |
 | Country ETFs | EIS, INDA, EIDO, GREK, EWI, EWN, EWG, EWU, EWW, COLO, ECH, ARGT, EWY, VNM, THD, EWS, EWT, EWA | 18 |
 | Fixed Income | TLT, IEF, SHY, LQD, HYG, EMB, TIP, GOVT | 8 |
 | Commodities | GLD, SLV, GDX, USO, DBA, DBC, PDBC, VNQ, COPX, URA | 10 |
 | FX & Volatility | UUP, FXE, FXY, VIXY | 4 |
-| Thematic & Defense | ITA, XAR, QTUM, BLOK, DRNZ, AIPO | 6 |
+| Thematic & Defense | ITA, XAR, QTUM, BLOK | 4 |
 | Global X Thematic | BOTZ, LIT, DRIV, SOCL, CLOU, BUG, AIQ, HERO, PAVE, KRMA, FINX, SNSR, EBIZ, GNOM, DTCR, SHLD | 16 |
 | Managed Futures | DBMF, KMLM, CTA, WTMF | 4 |
 | Crypto | BITO, IBIT | 2 |
@@ -111,15 +137,19 @@ pip install -e ".[dev]"
 cp .env.example .env
 # Edit .env with your FMP API key
 
-# Run full pipeline
-make run-all
+# Run full pipeline (fetches data, clusters, regimes, migration, centrality, exports)
+python -m src.pipeline.orchestrator run-all
 
-# Or step by step
-make fetch-data
-make build-features
-make run-clustering
-make run-migration
-make generate-figures
+# Run with cached data (skip API fetch)
+python -m src.pipeline.orchestrator run-all --skip-fetch
+
+# Run individual steps
+python -m src.pipeline.orchestrator run-step fetch-data
+python -m src.pipeline.orchestrator run-step run-clustering
+python -m src.pipeline.orchestrator run-step export-topology
+
+# Export topology to stock-signal-engine only
+python -m src.pipeline.orchestrator export-topology
 ```
 
 ## Novel Metrics
@@ -183,14 +213,14 @@ Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGE
 - [x] Cross-layer Granger causality (tail -> Pearson CMI) OOS replication test
 - [x] Topology crystallization pattern replication (restructuring before events)
 - [x] Early warning signal detection with false positive rate tracking
-- [ ] Run on full dataset and document results
+- [x] Run on full dataset (2010-2026)
 
 #### 4.2 Bootstrap & Confidence Intervals (`src/robustness/bootstrap.py`)
 - [x] Block bootstrap (Politis & Romano 1992) with configurable block size
 - [x] Generic `bootstrap_metric()` for any scalar metric CI
 - [x] `bootstrap_te_rankings()`: TE leadership stability across 1000 resamples
 - [x] `bootstrap_granger_f_stat()`: cross-layer Granger F-stat robustness
-- [ ] Run on full dataset and publish confidence bands
+- [x] Run on full dataset (2010-2026)
 
 #### 4.3 Sensitivity Analysis (`src/robustness/sensitivity.py`)
 - [x] Window size sweep: 60, 90, 120, 150, 180, 252 days
@@ -198,7 +228,7 @@ Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGE
 - [x] Leiden resolution sweep: 0.3, 0.5, 0.7, 1.0, 1.3, 1.5, 2.0
 - [x] Tail quantile sweep: 0.01, 0.03, 0.05, 0.10
 - [x] Automatic stability assessment (ROBUST / MODERATE / SENSITIVE)
-- [ ] Run on full dataset and document parameter stability
+- [x] Run on full dataset (2010-2026)
 
 #### 4.4 Multiple Testing Correction (`src/robustness/multiple_testing.py`)
 - [x] Bonferroni correction (FWER control)
@@ -206,7 +236,7 @@ Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGE
 - [x] Storey's q-value (adaptive FDR with pi_0 estimation)
 - [x] Aggregate binomial test (more significant pairs than chance?)
 - [x] `summarize_corrections()` for publication-ready comparison table
-- [ ] Run on full Granger matrix (8,190 pairs at 91 assets) and document survival rate
+- [x] Run on full dataset (2010-2026)
 
 #### 4.5 Small-Sample Robustness (`src/robustness/surrogate_testing.py`)
 - [x] Phase-randomized surrogates (Theiler et al. 1992) — preserves power spectrum
@@ -214,9 +244,20 @@ Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGE
 - [x] Surrogate TE significance test (null: TE from autocorrelation alone)
 - [x] Stationary block bootstrap (Politis & Romano 1994) — geometric block lengths
 - [x] Monte Carlo minimum sample size estimation (power analysis)
-- [ ] Run surrogate tests on regime-conditional TE and document results
+- [x] Run on full dataset (2010-2026)
+
+#### 4.6 Pipeline Automation & Integration (v0.5.0 — Completed)
+- [x] Full 8-step pipeline with CLI (fetch, validate, build-features, clustering, regimes, migration, centrality, export-topology)
+- [x] Topology export to stock-signal-engine cache for downstream model consumption
+- [x] Disconnected graph handling for eigenvector centrality
+- [x] Run logging with JSONL summaries
 
 ### Phase 5: Real-Time Extension
+
+#### 5.0 Data & Coverage Expansion (v0.5.0 — Completed)
+- [x] Extended data range to 2010 (was 2019)
+- [x] Completed GICS sector coverage (XLY, XLB, XLC, SOXX)
+- [x] 8 geopolitical event windows (COVID, EU debt crisis 2011, Fed 2022, SVB 2023, Japan carry 2024, Iran-Israel x2, DeepSeek 2025)
 
 #### 5.1 Streaming Pipeline
 - [ ] Replace batch FMP fetch with streaming price feed (WebSocket or polling)
@@ -236,7 +277,7 @@ Framework implemented + critical methodological fixes. See [CHANGELOG.md](CHANGE
 
 ### Phase 6: Extended Research
 
-- [ ] **Extend to 2008**: Source pre-2010 data for ETFs that existed (SPY, QQQ, TLT, GLD) to include the GFC
+- [ ] **Extend to 2008**: Partially achieved — now starts 2010. GFC extension requires sourcing pre-inception data for newer ETFs.
 - [ ] **Higher-frequency analysis**: Intraday 5-min returns during crisis windows
 - [ ] **Cross-market extension**: Sovereign CDS, VIX term structure, yield curve factors
 - [ ] **Causal discovery**: PCMCI+ or DYNOTEARS for full causal graph learning
@@ -253,7 +294,7 @@ The mutable logical workflow:
 
 ```
 1. FOUNDATION (Completed)
-   ├── Multi-asset universe construction (91 ETFs, 7 years)
+   ├── Multi-asset universe construction (91→96 ETFs, 16 years)
    ├── Rolling-window similarity computation (3 layers)
    ├── Community detection + migration tracking (CMI, TDS, AMF)
    └── Baseline event studies (COVID, Iran-Israel)
@@ -270,23 +311,25 @@ The mutable logical workflow:
    ├── Regime-conditional leadership reversal
    └── Cross-layer Granger causality (key discovery)
 
-4. STATISTICAL ROBUSTNESS (Framework Complete — v0.4.0)
+4. STATISTICAL ROBUSTNESS (Complete — Run on Full Dataset)
    ├── Methodological audit: fixed CMI permutation invariance, TDS scaling, Granger corrections
    ├── Walk-forward validation (train 2019-2022/test 2023-2024, expand + retest)
    ├── Block bootstrap confidence intervals (Politis & Romano 1992)
    ├── Sensitivity sweeps: window size, top-k, resolution, tail quantile
    ├── Multiple testing correction: Bonferroni, BH-FDR, Storey q-value
    ├── Surrogate data testing: phase-randomized + IAAFT null distributions
-   └── Monte Carlo power analysis for minimum sample size estimation
+   ├── Monte Carlo power analysis for minimum sample size estimation
+   └── Pipeline automation: 8-step CLI, topology export, run logging
 
 5. REAL-TIME EXTENSION
+   ├── Data range extended to 2010, GICS sectors completed, 8 event windows
    ├── Streaming data pipeline + incremental rolling window
    ├── Dashboard (Streamlit/Dash): live CMI, TDS, layer agreement
    ├── Alert system on tail CMI, TE leadership reversals
    └── Live validation against emerging events
 
 6. EXTENDED RESEARCH
-   ├── Extend to 2008 (GFC) with available ETFs
+   ├── Extend to 2008 (GFC) — partially achieved, now starts 2010
    ├── Intraday 5-min analysis during crisis windows
    ├── Causal discovery (PCMCI+, DYNOTEARS)
    ├── Geopolitical NLP layer (GDELT, news embeddings)

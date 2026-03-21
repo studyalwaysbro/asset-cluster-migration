@@ -16,7 +16,7 @@
 
 ## 2. Abstract
 
-We develop a dynamic multi-layer network framework for characterizing the evolving topology of global cross-asset relationships and detecting structural cluster migration during geopolitical stress episodes. Unlike static correlation-based clustering, our approach constructs parallel dependency layers — linear (shrinkage correlation), nonlinear (distance correlation), and tail (empirical co-exceedance) — updated over rolling windows, and applies Leiden community detection with temporal persistence tracking to identify when asset clusters form, fragment, merge, or undergo lasting regime shifts versus transient panic co-movement. We introduce novel metrics: a permutation-invariant Cluster Migration Index (CMI) using Hungarian matching to distinguish genuine structural migration from label noise, and a normalized Topology Deformation Score (TDS) combining Wasserstein degree distance, NMI community divergence, and Wasserstein spectral distance with z-score normalization for commensurable combination. Phase 3 adds directional information flow via KSG transfer entropy and Granger causality networks with Bonferroni correction and ADF stationarity pre-checks, revealing regime-conditional leadership reversals (calm: credit/real estate lead; war: Treasury complex leads). Phase 4 provides a comprehensive statistical robustness framework: walk-forward validation, block bootstrap confidence intervals, hyperparameter sensitivity sweeps, multiple testing correction (Bonferroni/BH-FDR/Storey q-value), and surrogate data testing. We validate on a diversified 91-ETF universe spanning equities, fixed income, commodities, currencies, crypto, managed futures, thematics, and 18 country-specific funds from January 2019 through the most recent trading day, using the Iran-Israel conflict cycle (2024-2025) and COVID-19 as primary event studies.
+We develop a dynamic multi-layer network framework for characterizing the evolving topology of global cross-asset relationships and detecting structural cluster migration during geopolitical stress episodes. Unlike static correlation-based clustering, our approach constructs parallel dependency layers — linear (shrinkage correlation), nonlinear (distance correlation), and tail (empirical co-exceedance) — updated over rolling windows, and applies Leiden community detection with temporal persistence tracking to identify when asset clusters form, fragment, merge, or undergo lasting regime shifts versus transient panic co-movement. We introduce novel metrics: a permutation-invariant Cluster Migration Index (CMI) using Hungarian matching to distinguish genuine structural migration from label noise, and a normalized Topology Deformation Score (TDS) combining Wasserstein degree distance, NMI community divergence, and Wasserstein spectral distance with z-score normalization for commensurable combination. Phase 3 adds directional information flow via KSG transfer entropy and Granger causality networks with Bonferroni correction and ADF stationarity pre-checks, revealing regime-conditional leadership reversals (calm: credit/real estate lead; war: Treasury complex leads). Phase 4 provides a comprehensive statistical robustness framework: walk-forward validation, block bootstrap confidence intervals, hyperparameter sensitivity sweeps, multiple testing correction (Bonferroni/BH-FDR/Storey q-value), and surrogate data testing. We validate on a diversified 96-ETF universe spanning equities, fixed income, commodities, currencies, crypto, managed futures, thematics, and 18 country-specific funds from January 2010 through the most recent trading day, spanning 16 years of regime diversity including the European sovereign debt crisis, taper tantrum, COVID-19 crash, Fed hiking cycle, SVB banking stress, and multiple geopolitical shocks, using the Iran-Israel conflict cycle (2024-2025) and COVID-19 as primary event studies.
 
 ---
 
@@ -76,21 +76,32 @@ The primary contribution is treating cluster migration as a first-class, measura
 
 | Component | Method | Status |
 |-----------|--------|--------|
-| Walk-forward | Train 2019-2022/test 2023-2024, expand + retest | Framework complete |
+| Walk-forward | Train 2010-2022/test 2023-2024, expand + retest | Framework complete |
 | Bootstrap CIs | Block bootstrap (Politis & Romano 1992) | Framework complete |
 | Sensitivity | Window, top-k, resolution, tail quantile sweeps | Framework complete |
 | Multiple testing | Bonferroni, BH-FDR, Storey q-value | Framework complete |
 | Surrogate testing | Phase-randomized, IAAFT, power analysis | Framework complete |
-| **Run on full dataset** | All 5 modules on 91-ETF data | **Pending** |
+| **Run on full dataset** | All 5 modules on 96-ETF data | **Pending** |
 
-### Phase 5: Real-Time Extension (Future)
+### Phase 5: Pipeline Automation & Data Expansion ✅
+
+| Component | Method | Status |
+|-----------|--------|--------|
+| Full pipeline | 8-step CLI orchestrator (Typer) | Complete |
+| Data expansion | 2019 → 2010 start date (16 years) | Complete |
+| Universe | +7 ETFs (VTI, XLY, XLB, XLC, SOXX, JEPI, COWZ), -2 (DRNZ, AIPO) | Complete |
+| Event windows | 2 → 8 events (EU 2011, COVID, Fed 2022, SVB, Japan carry, DeepSeek) | Complete |
+| Topology export | 4 parquets to stock-signal-engine for downstream ML | Complete |
+| Centrality fix | Disconnected graph eigenvector centrality fallback | Complete |
+
+### Phase 6: Real-Time Extension (Future)
 
 - Streaming data pipeline + incremental rolling window
 - Dashboard (Streamlit/Dash): live CMI, TDS, layer agreement
 - Alert system on tail CMI, TE leadership reversals
 - Live validation against emerging events
 
-### Phase 6: Extended Research (Future)
+### Phase 7: Extended Research (Future)
 
 - Extend to 2008 GFC with available ETFs
 - Intraday 5-min returns during crisis windows
@@ -100,7 +111,7 @@ The primary contribution is treating cluster migration as a first-class, measura
 
 ---
 
-## 5. Asset Universe (91 ETFs)
+## 5. Asset Universe (96 ETFs)
 
 ### Selection Criteria
 - Liquid ETFs with sufficient history (inception < 2020 preferred)
@@ -245,12 +256,12 @@ The primary contribution is treating cluster migration as a first-class, measura
 | BITO | Bitcoin Strategy | Bitcoin futures proxy (inception Oct 2021) |
 
 ### Data Specs
-- History: 2019-01-01 to most recent trading day (auto-extended via FMP stable API)
+- History: 2010-01-01 to most recent trading day (auto-extended via FMP stable API)
 - Frequency: Daily adjusted closes
 - Returns: Log returns computed locally with 1% Winsorization
 - Short-history handling: ETFs with >5% missing data auto-excluded by `align_and_clean()`
 - API: FMP stable endpoint (`historical-price-eod/dividend-adjusted`)
-- Estimated ~91 API calls for initial fetch, ~91/day for incremental updates
+- Estimated ~96 API calls for initial fetch, ~96/day for incremental updates
 
 ---
 
@@ -344,7 +355,7 @@ Tests whether tail-dependence CMI Granger-causes Pearson CMI (found: p=0.041), p
 | Stationary bootstrap | Politis & Romano (1994) | Geometric block lengths for autocorrelated data |
 | Phase-randomized surrogates | Theiler et al. (1992) | Null: TE from autocorrelation alone (preserves spectrum) |
 | IAAFT surrogates | Schreiber & Schmitz (1996) | Null preserving spectrum AND marginal distribution |
-| Bonferroni correction | — | FWER control for pairwise Granger (8,190 pairs at 91 assets) |
+| Bonferroni correction | — | FWER control for pairwise Granger (9,120 pairs at 96 assets) |
 | Benjamini-Hochberg | Benjamini & Hochberg (1995) | FDR control |
 | Storey q-value | Storey (2002) | Adaptive FDR with pi_0 estimation |
 | Monte Carlo power analysis | — | Minimum sample size for TE significance |
@@ -366,7 +377,7 @@ Tests whether tail-dependence CMI Granger-causes Pearson CMI (found: p=0.041), p
 ```
 Asset Cluster Migration/
 ├── config/
-│   ├── universe.yaml          # 91-ETF universe definition (13 groups)
+│   ├── universe.yaml          # 96-ETF universe definition (13 groups)
 │   ├── methodology.yaml       # All hyperparameters (windows, layers, clustering, regimes, TDS, seeds)
 │   ├── event_windows.yaml     # Iran-Israel Apr/Oct 2024, COVID, June 2025 events
 │   └── settings.yaml          # API and pipeline settings
@@ -457,7 +468,7 @@ Asset Cluster Migration/
 ## 9. Reproducibility Plan
 
 ### Data
-- `config/universe.yaml`: exact tickers (91), date ranges, source, inception dates for short-history ETFs
+- `config/universe.yaml`: exact tickers (96), date ranges, source, inception dates for short-history ETFs
 - Data manifests with SHA-256 checksums after each fetch
 - Processed parquet snapshots version-controlled (< 5MB for Phase 1)
 - Larger universes: GitHub Releases for data bundles
@@ -508,7 +519,7 @@ rich>=13.7, typer>=0.9
 | Granger lag selection | Bonferroni correction across tested lags |
 | Granger on nonstationary data | ADF stationarity pre-check (non-stationary → p=1.0) |
 | PELT over-segmentation | Proper BIC penalty: d * log(n), d=2 |
-| Multiple testing (8,190 pairs) | Bonferroni, BH-FDR, Storey q-value comparison |
+| Multiple testing (9,120 pairs) | Bonferroni, BH-FDR, Storey q-value comparison |
 | Small sample TE significance | Phase-randomized + IAAFT surrogate null distributions |
 | TE leadership robustness | Block bootstrap CIs (1000 resamples) |
 | OOS validity | Walk-forward validation (two expanding windows) |
@@ -579,7 +590,7 @@ Complete cluster dissolution (CMI=1.0) but recovered faster than the asymmetric 
 | Naive CMI | Counts label swaps as migration | Hungarian matching for true structural change |
 | Simple TDS aggregation | Incommensurable components | z-score normalization + Wasserstein spectral |
 | Uncorrected Granger | Cherry-picked lags, non-stationary data | Bonferroni + ADF pre-check |
-| Single hypothesis testing | Inflated false discovery rate | Bonferroni/BH-FDR/Storey across 8,190 pairs |
+| Single hypothesis testing | Inflated false discovery rate | Bonferroni/BH-FDR/Storey across 9,120 pairs |
 
 ---
 
@@ -594,3 +605,4 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 | v0.2.0 | 2026-03-11 | K-Means baseline, OOS validation, removed predictive.py |
 | v0.3.0 | 2026-03-11 | 91-ETF universe, live data extension, Plotly visualizations |
 | v0.4.0 | 2026-03-11 | Phase 4 robustness framework, 7 critical methodology fixes, 32 tests |
+| v0.5.0 | 2026-03-21 | Phase 5: 8-step CLI orchestrator, 2010 start date (16 years), 96-ETF universe (+7/-2), 8 event windows, topology export to stock-signal-engine, centrality fix |

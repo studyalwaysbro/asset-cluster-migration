@@ -12,6 +12,84 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.0] — 2026-03-21
+
+### Added — Phase 4.6: Pipeline Automation & Data Expansion
+
+**Full Pipeline Implementation** (`src/pipeline/steps.py`)
+- `step_fetch_data()`: Fetches all universe tickers from FMP API through last trading day
+- `step_validate_data()`: Checks staleness, coverage, and missing data percentages
+- `step_build_features()`: Cleans/aligns prices, computes log returns, saves parquets
+- `step_run_clustering()`: Rolling window Leiden clustering over full history (764 windows)
+- `step_run_regimes()`: Fits HMM regime detector (calm/transition/stress) on full returns
+- `step_run_migration()`: Computes CMI, AMF, CPS, TDS metrics per window with graph history
+- `step_compute_centrality()`: Betweenness, eigenvector, degree, closeness per rolling window
+- `step_export_topology()`: Exports 4 parquet files to stock-signal-engine/cache/topology/
+- `run_full_pipeline()`: End-to-end orchestrator calling all 8 steps sequentially
+
+**Pipeline Orchestrator** (`src/pipeline/orchestrator.py`)
+- CLI via Typer: `run-all`, `run-step <step>`, `export-topology`
+- `--skip-fetch` flag for using cached data
+- `--skip-export` flag to skip topology export
+- Run logging with JSONL summaries to `logs/run_summary.jsonl`
+- Persistent file logging with rotation (`logs/pipeline/`)
+
+**Topology Export** (NEW: downstream ML integration)
+- `cluster_membership.parquet`: 45,076 rows (date, ticker, cluster_id, days_since_migration, cluster_size)
+- `centrality_metrics.parquet`: 45,076 rows (date, ticker, degree, betweenness, eigenvector, closeness)
+- `regime_states.parquet`: 3,918 rows (date, regime, regime_probability, days_in_regime)
+- `topology_deformation.parquet`: 763 rows (date, tds_score, tds_zscore, layer_agreement)
+- Exports to `stock-signal-engine/cache/topology/` for TFT model topology feature consumption
+
+**Event Windows Expansion** (`config/event_windows.yaml`)
+- 2 → 8 geopolitical events with full sub-windows and confounders:
+  - EU Sovereign Debt Crisis & US Downgrade 2011
+  - COVID-19 Market Crash 2020
+  - Fed Hawkish Repricing 2022
+  - SVB Banking Stress 2023
+  - Iran-Israel April 2024 (existing)
+  - Iran-Israel October 2024 (existing)
+  - Japan Carry Trade Unwind August 2024
+  - DeepSeek AI Cost Shock January 2025
+
+**Universe Updates** (`config/universe.yaml`)
+- Added 7 ETFs: VTI (Total US Market), XLY (Consumer Discretionary), XLB (Materials), XLC (Communication Services), SOXX (Semiconductors), JEPI (Equity Premium Income), COWZ (Cash Cow Value)
+- Completes all 11 GICS sectors (XLY, XLB, XLC were missing)
+- Removed DRNZ, AIPO to watch list (< 18 months history, unreliable for 120-day rolling windows)
+- Net change: 91 → 96 tickers in universe
+
+**Council Logger** (`src/pipeline/council_logger.py`)
+- Training run logging for clustering and HMM steps
+- JSONL format for automated analysis
+
+### Changed
+- **Data range**: 2019-01-01 → 2010-01-01 (16 years vs 7 years)
+  - Captures EU debt crisis 2011, taper tantrum 2013, China deval 2015, vol-pocalypse 2018, COVID 2020, Fed hiking 2022, SVB 2023
+  - Newer ETFs auto-excluded from early windows via max_missing_pct filter
+- **`methodology.yaml`**: `min_inception_date` updated to 2010-01-01
+- **`src/graphs/topology.py`**: Added `_safe_eigenvector_centrality()` fallback for disconnected graphs
+  - Computes per-connected-component eigenvector centrality with scale normalization
+  - Prevents `AmbiguousSolution` crash on sparse rolling windows
+- **`src/pipeline/orchestrator.py`**: Skeleton → fully wired step dispatch with run logging
+
+### Fixed
+- Eigenvector centrality crash on disconnected graphs (`AmbiguousSolution` exception)
+- Empty cluster_assignments.parquet when cached data had wrong date range (cache clearing resolves)
+
+### Full Pipeline Run Results (2010-2026)
+- 59 assets survived cleaning (from 96 universe)
+- 3,938 trading days
+- 764 rolling windows (120-day, 5-day step)
+- 6 active clusters in latest window
+- 3 HMM regimes: calm (89.7%), transition (5.1%), stress (5.2%)
+- Mean CMI: 0.094, Max CMI: 0.441
+- Mean TDS: 0.022, Max TDS: 10.195
+- Most migration-prone: COLO (0.216), DBA (0.208), USO (0.206)
+- Most stable: VTV (0.016), DIA (0.018), RSPN (0.022)
+- Information flow leaders: HYG (+0.385 net), SHY (+0.227), EEM (+0.204)
+
+---
+
 ## [0.4.0] — 2026-03-11
 
 ### Added — Phase 4: Statistical Robustness
