@@ -117,11 +117,16 @@ def step_build_features() -> pd.DataFrame:
 # ── Step 4: Run clustering (rolling windows) ────────────────────────────
 
 def step_run_clustering() -> tuple[list, list]:
-    """Run Leiden clustering over rolling windows. Returns history + graphs."""
+    """Run clustering over rolling windows. Returns history + graphs.
+
+    Uses consensus Leiden by default (100 runs, resolution range [0.5, 2.0])
+    for adaptive cluster count. Falls back to single-resolution Leiden if
+    use_consensus is False in config.
+    """
     from src.features.rolling import RollingWindowEngine
     from src.features.similarity import compute_all_layers
     from src.graphs.construction import build_threshold_graph
-    from src.clustering.community import leiden_communities
+    from src.clustering.community import leiden_communities, consensus_communities
     from src.clustering.temporal import track_cluster_evolution
 
     _ensure_dirs()
@@ -136,10 +141,18 @@ def step_run_clustering() -> tuple[list, list]:
         min_periods=method_cfg["rolling_windows"]["min_periods"],
     )
 
-    resolution = method_cfg["clustering"]["leiden_resolution"]
+    clustering_cfg = method_cfg["clustering"]
+    use_consensus = clustering_cfg.get("use_consensus", True)
+    resolution = clustering_cfg["leiden_resolution"]
+    consensus_n_runs = clustering_cfg.get("consensus_n_runs", 100)
+    consensus_res_range = tuple(clustering_cfg.get("consensus_resolution_range", [0.5, 2.0]))
     seed = method_cfg["seeds"]["clustering"]
     top_k = method_cfg["graph"]["top_k_edges"]
-    sim_layers = method_cfg["similarity"]["layers"]
+
+    cluster_method = "consensus_leiden" if use_consensus else "single_leiden"
+    logger.info(f"Clustering method: {cluster_method}")
+    if use_consensus:
+        logger.info(f"  Consensus: {consensus_n_runs} runs, resolution range {consensus_res_range}")
 
     cluster_history = []  # (date, assignments)
     graph_history = []    # (date, graph)
@@ -162,8 +175,16 @@ def step_run_clustering() -> tuple[list, list]:
         # Build graph
         G = build_threshold_graph(S, labels, top_k=top_k)
 
-        # Run Leiden
-        communities = leiden_communities(G, resolution=resolution, seed=seed)
+        # Run clustering
+        if use_consensus:
+            communities = consensus_communities(
+                G,
+                n_runs=consensus_n_runs,
+                resolution_range=consensus_res_range,
+                seed=seed,
+            )
+        else:
+            communities = leiden_communities(G, resolution=resolution, seed=seed)
 
         cluster_history.append((window_date, communities))
         graph_history.append((window_date, G))
@@ -180,9 +201,11 @@ def step_run_clustering() -> tuple[list, list]:
     try:
         from src.pipeline.council_logger import log_training_run
         avg_clusters = sum(len(set(h[1].values())) for h in cluster_history) / max(len(cluster_history), 1)
-        log_training_run("Leiden-clustering", {
+        log_training_run(cluster_method, {
             "windows": len(cluster_history),
-            "resolution": resolution,
+            "method": cluster_method,
+            "resolution": resolution if not use_consensus else f"range{consensus_res_range}",
+            "consensus_n_runs": consensus_n_runs if use_consensus else None,
             "window_size": engine.window_size,
             "step_size": engine.step_size,
             "n_assets": len(tickers),
@@ -324,6 +347,93 @@ def step_run_migration(
     paths_df.to_parquet(PROCESSED_DIR / "migration_paths.parquet", index=False)
 
     logger.info(f"Migration metrics: {len(migration_records)} windows, mean CMI={migration_df['cmi'].mean():.3f}")
+
+    # ── Fast-window TDS (40-day early-warning) ────────────────────────
+    if method_cfg["rolling_windows"].get("fast_window_enabled", False):
+        _compute_fast_tds(method_cfg)
+
+
+def _compute_fast_tds(method_cfg: dict) -> None:
+    """Compute TDS on a fast (40-day) window for early-warning spike detection.
+
+    Saves alongside the primary migration timeseries as a separate parquet.
+    The stock engine can use fast_tds_zscore > 2.0 as a circuit breaker.
+    """
+    from src.features.rolling import RollingWindowEngine
+    from src.features.similarity import compute_all_layers
+    from src.graphs.construction import build_threshold_graph
+    from src.clustering.community import leiden_communities
+    from src.migration.metrics import (
+        cluster_migration_index,
+        topology_deformation_score,
+        TDSNormalizer,
+    )
+
+    fast_window = method_cfg["rolling_windows"].get("fast_window", 40)
+    step_size = method_cfg["rolling_windows"]["step_size"]
+    min_periods = min(method_cfg["rolling_windows"].get("min_periods", 40), fast_window)
+    seed = method_cfg["seeds"]["clustering"]
+    top_k = method_cfg["graph"]["top_k_edges"]
+    tds_weights = tuple(method_cfg["migration"]["tds_weights"])
+
+    returns = pd.read_parquet(PROCESSED_DIR / "log_returns.parquet")
+
+    engine = RollingWindowEngine(
+        window_size=fast_window,
+        step_size=step_size,
+        min_periods=min_periods,
+    )
+
+    normalizer = TDSNormalizer()
+    prev_assign = None
+    prev_graph = None
+    fast_records = []
+
+    n_windows = engine.window_count(returns)
+    logger.info(f"Running fast TDS ({fast_window}d window) over {n_windows} windows...")
+
+    for i, (window_date, window_returns) in enumerate(engine.generate_windows(returns)):
+        valid_cols = window_returns.columns[window_returns.notna().sum() >= min_periods]
+        window_clean = window_returns[valid_cols].dropna()
+
+        if window_clean.shape[1] < 5:
+            continue
+
+        layers = compute_all_layers(window_clean, ["pearson_shrinkage"])
+        S = layers["pearson_shrinkage"]
+        labels = list(window_clean.columns)
+        G = build_threshold_graph(S, labels, top_k=top_k)
+        communities = leiden_communities(G, resolution=1.0, seed=seed)
+
+        if prev_assign is not None and prev_graph is not None:
+            cmi = cluster_migration_index(communities, prev_assign)
+            tds = topology_deformation_score(
+                G, prev_graph, communities, prev_assign,
+                weights=tds_weights, normalizer=normalizer,
+            )
+            fast_records.append({
+                "date": window_date,
+                "fast_cmi": cmi,
+                "fast_tds": tds,
+            })
+
+        prev_assign = communities
+        prev_graph = G
+
+    if fast_records:
+        fast_df = pd.DataFrame(fast_records)
+        # Compute z-scores
+        tds_mean = fast_df["fast_tds"].expanding().mean()
+        tds_std = fast_df["fast_tds"].expanding().std().fillna(1.0).replace(0.0, 1.0)
+        fast_df["fast_tds_zscore"] = (fast_df["fast_tds"] - tds_mean) / tds_std
+        fast_df.to_parquet(PROCESSED_DIR / "fast_tds_timeseries.parquet", index=False)
+        logger.info(
+            f"Fast TDS: {len(fast_records)} windows, "
+            f"mean={fast_df['fast_tds'].mean():.3f}, "
+            f"max_zscore={fast_df['fast_tds_zscore'].max():.2f}"
+        )
+    else:
+        logger.warning("No fast TDS windows computed")
 
 
 # ── Step 7: Compute centrality metrics ──────────────────────────────────

@@ -3,8 +3,10 @@
 rolling_windows:
   window_sizes: [60, 120, 252]
   step_size: 5
-  min_periods: 60
+  min_periods: 40
   primary_window: 120
+  fast_window: 40                    # Early-warning window for TDS spike detection
+  fast_window_enabled: true          # Dual-frequency: 120d primary + 40d fast
 
 ewma:
   half_lives: [21, 63]
@@ -27,10 +29,11 @@ graph:
 
 clustering:
   primary_method: leiden
-  leiden_resolution: 1.0
+  use_consensus: true               # Multi-resolution consensus (adaptive cluster count)
+  leiden_resolution: 1.0             # Fallback when use_consensus: false
   spectral_max_clusters: 10
-  consensus_n_runs: 100
-  consensus_resolution_range: [0.5, 2.0]
+  consensus_n_runs: 100              # Number of Leiden runs per window
+  consensus_resolution_range: [0.5, 2.0]  # Resolution sampling range
 
 regimes:
   n_regimes: 3

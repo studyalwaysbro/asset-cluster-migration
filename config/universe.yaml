@@ -90,6 +90,10 @@ assets:
     - {ticker: XAR, name: "S&P Aero Defense", category: thematic}
     - {ticker: IBIT, name: "Bitcoin Trust", category: crypto, inception: "2024-01-11"}
     - {ticker: BITO, name: "Bitcoin Strategy", category: crypto, inception: "2021-10-19"}
+    - {ticker: BITX, name: "2x Bitcoin Strategy", category: crypto, inception: "2023-06-27"}
+    - {ticker: ETHA, name: "Spot Ethereum ETF", category: crypto, inception: "2024-07-23"}
+    - {ticker: FETH, name: "Fidelity Ethereum ETF", category: crypto, inception: "2024-07-23"}
+    - {ticker: MAGS, name: "Magnificent 7 ETF", category: equity_us, inception: "2023-04-11"}
     - {ticker: QTUM, name: "Quantum Computing & AI", category: thematic}
     - {ticker: BLOK, name: "Blockchain", category: thematic}
     # WATCH LIST — insufficient history for reliable clustering (< 18 months)

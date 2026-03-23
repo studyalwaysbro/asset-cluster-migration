@@ -46,6 +46,20 @@ _write_doc.py
 # Claude Code
 .claude/
 
+# LaTeX temp files
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+paper_chunk.txt
+paper_plaintext.txt
+strip_latex.py
+
 # Virtual env & logs
 logs/
 notebooks/

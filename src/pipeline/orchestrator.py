@@ -126,6 +126,17 @@ def run_all(
     steps_run = list(STEPS)
     error = None
 
+    # Register process lock
+    try:
+        import subprocess, sys as _sys
+        subprocess.run(
+            [_sys.executable, str(Path.home() / ".openclaw/scripts/process-lock.py"),
+             "start", "acm-pipeline", f"Full pipeline {datetime.now().strftime('%Y-%m-%d')}"],
+            capture_output=True, timeout=5,
+        )
+    except Exception:
+        pass
+
     try:
         if skip_fetch:
             console.print("[yellow]Skipping fetch step (using cached data)[/yellow]")
@@ -159,6 +170,15 @@ def run_all(
         raise
     finally:
         _log_run_summary(steps_run, time.time() - t0, error)
+        # Release process lock
+        try:
+            subprocess.run(
+                [_sys.executable, str(Path.home() / ".openclaw/scripts/process-lock.py"),
+                 "stop", "acm-pipeline"],
+                capture_output=True, timeout=5,
+            )
+        except Exception:
+            pass
 
 
 @app.command()
