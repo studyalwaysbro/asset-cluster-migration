@@ -1,0 +1,33 @@
+{
+  "granger_replication_rate": 0.0,
+  "crystallization_replication_rate": 0.0,
+  "mean_fpr": 0.5,
+  "folds": [
+    {
+      "train": "2011-01-20 to 2022-12-28",
+      "test": "2023-01-05 to 2024-12-24",
+      "granger_f_train": 1.5153816622319805,
+      "granger_p_train": 0.9149784177432883,
+      "granger_f_test": 1.6275495704610177,
+      "granger_p_test": 0.8726357588307694,
+      "replicates": false,
+      "n_warnings": 0,
+      "n_tp": 0,
+      "n_fp": 0,
+      "fpr": 0.0
+    },
+    {
+      "train": "2011-01-20 to 2024-12-24",
+      "test": "2025-01-02 to 2026-03-24",
+      "granger_f_train": 1.6880037845268547,
+      "granger_p_train": 0.675970238111637,
+      "granger_f_test": 0.0,
+      "granger_p_test": 1.0,
+      "replicates": false,
+      "n_warnings": 1,
+      "n_tp": 0,
+      "n_fp": 1,
+      "fpr": 1.0
+    }
+  ]
+}

@@ -1,5 +1,9 @@
 # Asset Universe Definition
-# Expanded: 100+ diversified ETFs across 14 groups
+# Expanded: 136 diversified ETFs across 21 groups
+# Updated 2026-03-30: full commodity decomposition (precious, energy, agriculture,
+# industrial, broad), expanded FX (7 currencies), EM bonds (VWOB, PCY, BWX, BNDX),
+# safe havens (BTAL, TAIL, MINT), agriculture (CORN, SOYB, WEAT, CANE, COW),
+# industrial metals (CPER, SLX, PICK), platinum/palladium
 # Updated 2026-03-21: pushed start to 2010 for more regime diversity,
 # added missing GICS sectors, semis, total market, value/income factors
 
@@ -39,6 +43,7 @@ assets:
     - {ticker: EWJ, name: "Japan", category: equity_intl}
     - {ticker: VGK, name: "Europe", category: equity_intl}
     - {ticker: CQQQ, name: "China Technology", category: equity_em}
+    - {ticker: EWQ, name: "France", category: equity_intl}
 
   country_etfs:
     - {ticker: EIS, name: "Israel", category: equity_intl}
@@ -64,26 +69,69 @@ assets:
     - {ticker: TLT, name: "20+ Yr Treasury", category: bond_govt}
     - {ticker: IEF, name: "7-10 Yr Treasury", category: bond_govt}
     - {ticker: SHY, name: "1-3 Yr Treasury", category: bond_govt}
+    - {ticker: AGG, name: "US Aggregate Bond", category: bond_govt}
     - {ticker: LQD, name: "IG Corp", category: bond_credit}
     - {ticker: HYG, name: "High Yield", category: bond_credit}
-    - {ticker: EMB, name: "EM Bonds", category: bond_em}
+    - {ticker: EMB, name: "EM USD Bonds", category: bond_em}
+    - {ticker: VWOB, name: "EM Govt Bonds", category: bond_em}
+    - {ticker: BNDX, name: "Intl Bond ex-US", category: bond_intl}
+    - {ticker: PCY, name: "EM Sovereign Bonds", category: bond_em}
+    - {ticker: BWX, name: "Intl Treasury ex-US", category: bond_intl}
 
-  commodities:
+  commodities_precious:
     - {ticker: GLD, name: "Gold", category: commodity}
     - {ticker: SLV, name: "Silver", category: commodity}
     - {ticker: GDX, name: "Gold Miners", category: commodity}
-    - {ticker: USO, name: "Crude Oil", category: commodity}
-    - {ticker: DBA, name: "Agriculture", category: commodity}
-    - {ticker: DBC, name: "Broad Commodities", category: commodity}
-    - {ticker: VNQ, name: "Real Estate REIT", category: real_asset}
+    - {ticker: PPLT, name: "Platinum", category: commodity}
+    - {ticker: PALL, name: "Palladium", category: commodity}
+
+  commodities_energy:
+    - {ticker: USO, name: "Crude Oil WTI", category: commodity}
+    - {ticker: BNO, name: "Brent Crude", category: commodity}
+    - {ticker: UNG, name: "Natural Gas", category: commodity}
+    - {ticker: XOP, name: "Oil & Gas E&P", category: commodity}
+
+  commodities_agriculture:
+    - {ticker: DBA, name: "Agriculture Index", category: commodity}
+    - {ticker: CORN, name: "Corn", category: commodity}
+    - {ticker: SOYB, name: "Soybeans", category: commodity}
+    - {ticker: WEAT, name: "Wheat", category: commodity}
+    - {ticker: CANE, name: "Sugar", category: commodity}
+    - {ticker: COW, name: "Livestock", category: commodity}
+
+  commodities_industrial:
+    - {ticker: CPER, name: "Copper", category: commodity}
+    - {ticker: SLX, name: "Steel", category: commodity}
+    - {ticker: PICK, name: "Mining", category: commodity}
     - {ticker: COPX, name: "Copper Miners", category: commodity}
     - {ticker: URA, name: "Uranium", category: commodity}
 
-  fx_volatility:
-    - {ticker: UUP, name: "Dollar Bull", category: fx}
+  commodities_broad:
+    - {ticker: DBC, name: "Broad Commodities", category: commodity}
+    - {ticker: PDBC, name: "Optimum Yield", category: commodity}
+    - {ticker: VNQ, name: "Real Estate REIT", category: real_asset}
+    - {ticker: VNQI, name: "Intl Real Estate", category: real_asset}
+
+  fx:
+    - {ticker: UUP, name: "US Dollar Bull", category: fx}
     - {ticker: FXE, name: "Euro", category: fx}
-    - {ticker: FXY, name: "Yen", category: fx}
+    - {ticker: FXY, name: "Japanese Yen", category: fx}
+    - {ticker: FXB, name: "British Pound", category: fx}
+    - {ticker: FXA, name: "Australian Dollar", category: fx}
+    - {ticker: FXC, name: "Canadian Dollar", category: fx}
+    - {ticker: CYB, name: "Chinese Yuan", category: fx}
+    - {ticker: BZF, name: "Brazilian Real", category: fx}
+
+  volatility:
     - {ticker: VIXY, name: "VIX Short-Term", category: volatility}
+    - {ticker: VIXM, name: "VIX Mid-Term", category: volatility}
+
+  frontier_global:
+    - {ticker: FM, name: "Frontier Markets", category: equity_fm, inception: "2012-06-12"}
+    - {ticker: AFK, name: "Africa", category: equity_fm}
+    - {ticker: KWEB, name: "China Internet", category: equity_em}
+    - {ticker: IEMG, name: "Core MSCI EM", category: equity_em}
+    - {ticker: VWO, name: "FTSE EM", category: equity_em}
 
   thematic:
     - {ticker: ITA, name: "Aerospace Defense", category: thematic}
@@ -131,7 +179,11 @@ assets:
     - {ticker: CTA, name: "Simplify Managed Futures", category: alternatives, inception: "2022-03-01"}
     - {ticker: WTMF, name: "WisdomTree Managed Futures", category: alternatives}
 
+  safe_havens:
+    - {ticker: BTAL, name: "Anti-Beta (Long Low/Short High Vol)", category: alternatives}
+    - {ticker: TAIL, name: "Put Spread Tail Hedge", category: alternatives, inception: "2017-06-08"}
+    - {ticker: MINT, name: "Short Maturity Bond", category: alternatives}
+
   alternatives:
     - {ticker: TIP, name: "TIPS", category: inflation}
-    - {ticker: PDBC, name: "Optimum Yield", category: commodity}
     - {ticker: GOVT, name: "US Treasury Bond", category: bond_govt}

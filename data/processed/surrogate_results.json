@@ -1,0 +1,51 @@
+{
+  "EEM\u2192SPY": {
+    "observed": 0.0,
+    "surrogate_mean": 0.028340605760525394,
+    "p_value": 1.0,
+    "effect_size": -1.474891665129338,
+    "significant": false
+  },
+  "EEM\u2192GLD": {
+    "observed": 0.026346967054895476,
+    "surrogate_mean": 0.027743944785885807,
+    "p_value": 0.51,
+    "effect_size": -0.07418538205573598,
+    "significant": false
+  },
+  "GLD\u2192TLT": {
+    "observed": 0.0,
+    "surrogate_mean": 0.028033217778364417,
+    "p_value": 1.0,
+    "effect_size": -1.4629068473476434,
+    "significant": false
+  },
+  "USO\u2192XLE": {
+    "observed": 0.023870264830601062,
+    "surrogate_mean": 0.02490115535853673,
+    "p_value": 0.515,
+    "effect_size": -0.0558143037208768,
+    "significant": false
+  },
+  "HYG\u2192SPY": {
+    "observed": 0.004585156835349213,
+    "surrogate_mean": 0.027163880516279815,
+    "p_value": 0.885,
+    "effect_size": -1.2415114617251766,
+    "significant": false
+  },
+  "UUP\u2192GLD": {
+    "observed": 0.04990243469328037,
+    "surrogate_mean": 0.02859096198991278,
+    "p_value": 0.135,
+    "effect_size": 1.1312529294350897,
+    "significant": false
+  },
+  "FXA\u2192GLD": {
+    "observed": 0.024718082865466506,
+    "surrogate_mean": 0.026756379951547084,
+    "p_value": 0.485,
+    "effect_size": -0.1042309121349516,
+    "significant": false
+  }
+}

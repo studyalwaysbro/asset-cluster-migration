@@ -589,9 +589,35 @@ def step_export_topology(
     logger.info(f"Topology export complete -> {topology_dir}")
 
 
+# ── Step 9: Generate daily report ──────────────────────────────────────
+
+def step_generate_report() -> Path:
+    """Generate comprehensive daily HTML report + slides from pipeline outputs."""
+    from src.reports.daily_report import generate_daily_report
+    from src.reports.slides import generate_slide_deck
+
+    report_path = generate_daily_report()
+    logger.info(f"Daily report: {report_path}")
+
+    try:
+        slides_path = generate_slide_deck()
+        logger.info(f"Slide deck: {slides_path}")
+    except Exception as e:
+        logger.warning(f"Slide deck generation failed (non-fatal): {e}")
+
+    try:
+        from src.reports.speaker_notes import generate_speaker_notes
+        notes_path = generate_speaker_notes()
+        logger.info(f"Speaker notes: {notes_path}")
+    except Exception as e:
+        logger.warning(f"Speaker notes generation failed (non-fatal): {e}")
+
+    return report_path
+
+
 # ── Full pipeline runner ─────────────────────────────────────────────────
 
-def run_full_pipeline(export_topology: bool = True) -> None:
+def run_full_pipeline(export_topology: bool = True, generate_report: bool = True) -> None:
     """Run the complete ACM pipeline end-to-end."""
     logger.info("=" * 60)
     logger.info("ASSET CLUSTER MIGRATION — FULL PIPELINE")
@@ -621,6 +647,10 @@ def run_full_pipeline(export_topology: bool = True) -> None:
     # 8. Export topology parquets
     if export_topology:
         step_export_topology()
+
+    # 9. Generate daily report
+    if generate_report:
+        step_generate_report()
 
     logger.info("=" * 60)
     logger.info("PIPELINE COMPLETE")

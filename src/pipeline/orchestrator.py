@@ -47,6 +47,7 @@ STEPS = [
     "run-migration",
     "compute-centrality",
     "export-topology",
+    "generate-report",
 ]
 
 
@@ -81,6 +82,7 @@ def run_step(step: str) -> None:
         step_run_migration,
         step_compute_centrality,
         step_export_topology,
+        step_generate_report,
     )
 
     dispatch = {
@@ -92,6 +94,7 @@ def run_step(step: str) -> None:
         "run-migration": step_run_migration,
         "compute-centrality": step_compute_centrality,
         "export-topology": step_export_topology,
+        "generate-report": step_generate_report,
     }
 
     if step not in dispatch:
