@@ -12,6 +12,83 @@ and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.0] — 2026-04-10
+
+### Added — Reporting, Presentation, Universe Expansion & Full Robustness Execution
+
+**Daily Report Generator** (`src/reports/daily_report.py`)
+- 18-section HTML report (~400 KB) with dark theme, auto-generated daily
+- Sections: Executive Summary/TLDR, CMI/TDS Timeseries, Cluster Network Graph, Correlation Heatmap, Regime Analysis, Cluster Composition, Migration Metrics, Network Centrality, AMF Rankings, Novel Findings & Alerts, Discussion & Interpretation, Statistical Robustness, Data Quality
+- `latest` symlink for easy access at `outputs/reports/acm_daily_report_latest.html`
+
+**Interactive Charts** (`src/reports/charts.py`)
+- CMI/TDS timeseries with regime shading (interactive Plotly)
+- Force-directed cluster network graph (nodes sized by centrality, colored by cluster)
+- Correlation heatmap with hierarchical clustering order
+
+**Presentation Slide Deck** (`src/reports/slides.py`, `src/reports/slide_charts.py`)
+- Auto-generated HTML slide deck from pipeline data
+- Slide-specific chart generators for presentation-quality visuals
+
+**Speaker Notes** (`src/reports/speaker_notes.py`)
+- Automated companion speaker notes generated alongside each slide deck
+
+**Automated Discussion Section**
+- `_build_discussion()` generates interpretive commentary in daily report
+- Regime narrative (prolonged instability, flickering, stress duration)
+- Cross-asset insights (gold/safe-haven decoupling, USD/energy pairing, HYG/IG divergence)
+- Network structure interpretation (hub identification, bridge nodes)
+- Migration context (percentile ranking, reshuffling assessment)
+
+**Universe Expansion** (96 → 136 ETFs, 14 → 21 groups)
+- Precious Metals: PPLT, PALL (industrial-precious bridge)
+- Energy: BNO (Brent Crude), UNG (Natural Gas), XOP (Oil & Gas E&P)
+- Agriculture: CORN, SOYB, WEAT, CANE, COW (food inflation cluster)
+- Industrial Metals: CPER, SLX, PICK (copper/steel/mining)
+- Currencies: FXB, FXA, FXC, CYB (commodity currencies)
+- Bonds: AGG, VWOB, BNDX, PCY, BWX (EM/intl bonds)
+- Safe Havens: BTAL (Anti-Beta), TAIL (Put Spread Hedge), MINT (Short Maturity)
+- Global: EWQ, VNQI, FM, AFK, KWEB, IEMG, VWO, BZF
+- Volatility: VIXM added
+- Commodities reorganized into 5 sub-groups (precious, energy, agriculture, industrial, broad)
+
+**Full Robustness Suite Executed on 134-Ticker Universe** (2026-03-31)
+- K-Means baseline: Leiden CMI 0.113 vs K-Means 0.159 (Leiden 40% more stable), ARI 0.277, NMI 0.500
+- Regime validation: 88.9% ± 8.5% accuracy, top feature CMI rolling mean (0.325)
+- Bootstrap CIs (1,000 resamples, block=20): CMI [0.105, 0.121], CPS [0.770, 0.798]
+- Sensitivity: window size MODERATE, top-K SENSITIVE, tail quantile SENSITIVE
+- Walk-forward: Granger replication 0% OOS (regime-dependent, not stable causal)
+- Surrogate testing: no pair significant at p<0.05 (TE is contemporaneous correlation)
+
+**LaTeX Research Paper** (`paper.tex`)
+- Full methodology paper with publication-quality typesetting
+
+### Changed
+- **Pipeline**: 8 steps → 9 steps (added `generate-report` producing report + slides + speaker notes)
+- **Universe**: `config/universe.yaml` expanded from 96 to 136 tickers across 21 groups
+- **Assets surviving cleaning**: 59 → 76 (expanded universe, same >5% missing threshold)
+- **Rolling windows**: 764 → 767 (additional trading days since March)
+- **Cron**: upgraded from 2-step (fetch+build) to full 9-step `run-all` pipeline (3:30 PM ET Mon-Sat)
+- **Pipeline runtime**: ~2 minutes for full 9-step execution including report generation
+- **Key findings updated**: honest caveats on walk-forward/surrogate results added alongside strong descriptive results
+
+### Fixed
+- Configuration cleanup: removed hardcoded paths and external references (commit `8ec4106`)
+
+### Known Issues
+- No market holiday awareness — pipeline runs on holidays and fails on stale data (identified 2026-04-03, Good Friday)
+- Regime display bug in morning briefing (parsing `regime_info` nested structure)
+
+### Council Sessions (2026-03-21 through 2026-04-03)
+- **2026-03-21**: v0.5.0 release, pipeline upgrades, signal reliability assessment
+- **2026-03-28**: Asset clusters as stock signal engine input — feasibility analysis for downstream ML consumption
+- **2026-03-30**: Strategic expansion roadmap — universe 96→134, report generator, cron upgrade, P0-P5 prioritization
+- **2026-03-31**: Full P0-P2 execution — charts, K-Means baseline, regime validation, complete robustness suite
+- **2026-04-02**: K-Means limitations analysis — 7 structural weaknesses documented, strengthens Leiden argument
+- **2026-04-03**: Holiday-blind cron scheduling — identified missing market calendar, recommended `market_calendar.py` with `exchange_calendars` package
+
+---
+
 ## [0.5.0] — 2026-03-21
 
 ### Added — Phase 4.6: Pipeline Automation & Data Expansion

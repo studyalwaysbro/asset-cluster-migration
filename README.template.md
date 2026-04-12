@@ -1,6 +1,6 @@
 # Dynamic Multi-Asset Topology and Cluster Migration Under Geopolitical Stress
 
-> **Disclaimer:** This project is produced solely for educational and academic research purposes. Nothing in this repository constitutes investment advice, a solicitation, or a recommendation to buy, sell, or hold any security or financial instrument. This project is not connected to, endorsed by, or produced in any professional capacity related to any broker-dealer or investment advisory firm. The authors are presenting independent academic research on asset clustering methodologies. Past performance and historical patterns do not guarantee future results.
+> **Disclaimer:** This project is produced solely for educational and academic research purposes. Nothing in this repository constitutes investment advice, a solicitation, or a recommendation to buy, sell, or hold any security or financial instrument. The authors are presenting independent academic research on asset clustering methodologies. Past performance and historical patterns do not guarantee future results.
 
 ## Authors
 
@@ -25,37 +25,15 @@ The pipeline runs automatically via cron, producing daily HTML reports with inte
 ### Key Findings
 
 <!-- BEGIN:DYNAMIC pipeline_stats -->
-<!-- Generated from data/processed/cluster_assignments.parquet (modified 2026-04-10) -->
-
-**Clustering:** 76 assets across 767 rolling windows, 8 active clusters in latest window.
-
-<!-- Generated from data/processed/regime_labels.csv (modified 2026-04-10) -->
-
-**Regime detection:** 2010-08-23 to 2026-04-10. Current regime: **stress**. Distribution: transition (43.2%), calm (43.2%), stress (13.6%).
-
-<!-- Generated from data/processed/bootstrap_results.json (modified 2026-03-31) -->
-
-**Bootstrap 95% CIs (block bootstrap):** CMI [0.105, 0.121], CPS [0.770, 0.798].
+This section is auto-generated. Do not edit manually.
+Run `python scripts/generate_readme.py` to refresh.
 <!-- END:DYNAMIC pipeline_stats -->
 
 ## Latest Pipeline Results
 
 <!-- BEGIN:DYNAMIC latest_results -->
-<!-- Generated from data/processed/cluster_assignments.parquet (modified 2026-04-10) -->
-<!-- Generated from data/processed/regime_labels.csv (modified 2026-04-10) -->
-<!-- Generated from data/processed/bootstrap_results.json (modified 2026-03-31) -->
-
-| Metric | Value |
-|--------|-------|
-| Universe defined | 134 ETFs across 19 asset groups |
-| Assets surviving cleaning | 76 of 134 |
-| Rolling windows | 767 |
-| Active clusters (latest window) | 8 |
-| Trading days | 3,932 (2010-08-23 to 2026-04-10) |
-| HMM regimes | 3: transition (43.2%), calm (43.2%), stress (13.6%) |
-| Mean CMI | 0.113 |
-| Mean TDS | -0.023 |
-| Daily report size | ~406 KB |
+This section is auto-generated. Do not edit manually.
+Run `python scripts/generate_readme.py` to refresh.
 <!-- END:DYNAMIC latest_results -->
 
 ## Repository Structure
@@ -129,31 +107,8 @@ Asset Cluster Migration/
 ## Asset Universe
 
 <!-- BEGIN:DYNAMIC universe_summary -->
-<!-- Generated from config/universe.yaml (modified 2026-03-30) -->
-
-**134 ETFs** across 19 categories:
-
-| Category | Tickers | Count |
-|----------|---------|-------|
-| Us Equity Benchmarks | SPY, QQQ, IWM, DIA, VTI | 5 |
-| Us Sectors | XLE, XLF, XLV, XLU, XLI, XLK, XLP, XLY, XLB, XLC, XLRE, RSPN, SOXX | 13 |
-| International | EFA, EEM, FXI, EWZ, EWJ, VGK, CQQQ, EWQ | 8 |
-| Country Etfs | EIS, INDA, EIDO, GREK, EWI, EWN, EWG, EWU, EWW, COLO, ECH, ARGT, EWY, VNM, THD, EWS, EWT, EWA | 18 |
-| Fixed Income | TLT, IEF, SHY, AGG, LQD, HYG, EMB, VWOB, BNDX, PCY, BWX | 11 |
-| Commodities Precious | GLD, SLV, GDX, PPLT, PALL | 5 |
-| Commodities Energy | USO, BNO, UNG, XOP | 4 |
-| Commodities Agriculture | DBA, CORN, SOYB, WEAT, CANE, COW | 6 |
-| Commodities Industrial | CPER, SLX, PICK, COPX, URA | 5 |
-| Commodities Broad | DBC, PDBC, VNQ, VNQI | 4 |
-| Fx | UUP, FXE, FXY, FXB, FXA, FXC, CYB, BZF | 8 |
-| Volatility | VIXY, VIXM | 2 |
-| Frontier Global | FM, AFK, KWEB, IEMG, VWO | 5 |
-| Thematic | ITA, XAR, IBIT, BITO, BITX, ETHA, FETH, MAGS, QTUM, BLOK | 10 |
-| Global X Thematic | BOTZ, LIT, DRIV, SOCL, CLOU, BUG, AIQ, HERO, PAVE, KRMA, FINX, SNSR, EBIZ, GNOM, DTCR, SHLD | 16 |
-| Dividend Value | SCHD, VTV, VYMI, JEPI, COWZ | 5 |
-| Managed Futures | DBMF, KMLM, CTA, WTMF | 4 |
-| Safe Havens | BTAL, TAIL, MINT | 3 |
-| Alternatives | TIP, GOVT | 2 |
+This section is auto-generated. Do not edit manually.
+Run `python scripts/generate_readme.py` to refresh.
 <!-- END:DYNAMIC universe_summary -->
 
 ## Quick Start
@@ -460,5 +415,4 @@ If you use this work in academic research, please cite:
 > **Reminder:** This project is for educational and research purposes only. It does not constitute investment advice. See the full disclaimer in the [research report](outputs/final_report.pdf).
 
 <!-- BEGIN:DYNAMIC generation_stamp -->
-*Auto-generated on 2026-04-12 01:50 ET from pipeline artifacts. Do not edit this section manually.*
 <!-- END:DYNAMIC generation_stamp -->

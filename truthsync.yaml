@@ -1,0 +1,18 @@
+project: Asset-Cluster-Migration
+dormant_after_days: 30
+sources:
+  - path: data/processed/regime_labels.csv
+    required: true
+  - path: data/processed/cluster_assignments.parquet
+    required: true
+  - glob: outputs/reports/acm_daily_report_*.html
+    required: false
+derived:
+  - path: README.md
+    required: true
+    semantic_date_regexes:
+      - 'Current regime \| \*\*.+?\*\* \(as of (\d{4}-\d{2}-\d{2})\)'
+      - 'Trading days \| [^)]* to (\d{4}-\d{2}-\d{2})\)'
+  - path: CHANGELOG.md
+    required: true
+regenerate: python3 scripts/generate_readme.py
