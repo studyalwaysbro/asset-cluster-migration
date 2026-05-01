@@ -1,6 +1,6 @@
 # Dynamic Multi-Asset Topology and Cluster Migration Under Geopolitical Stress
 
-> **Disclaimer:** This project is produced solely for educational and academic research purposes. Nothing in this repository constitutes investment advice, a solicitation, or a recommendation to buy, sell, or hold any security or financial instrument. This project is not connected to, endorsed by, or produced in any professional capacity related to any broker-dealer or investment advisory firm. The authors are presenting independent academic research on asset clustering methodologies. Past performance and historical patterns do not guarantee future results.
+> **Disclaimer:** This project is produced solely for educational and academic research purposes. Nothing in this repository constitutes investment advice, a solicitation, or a recommendation to buy, sell, or hold any security or financial instrument. The authors are presenting independent academic research on asset clustering methodologies. Past performance and historical patterns do not guarantee future results.
 
 ## Authors
 
@@ -25,13 +25,8 @@ The pipeline runs automatically via cron, producing daily HTML reports with inte
 ### Key Findings
 
 <!-- BEGIN:DYNAMIC pipeline_stats -->
-<!-- Generated from data/processed/cluster_assignments.parquet (modified 2026-04-10) -->
-
-**Clustering:** 76 assets across 767 rolling windows, 8 active clusters in latest window.
-
-<!-- Generated from data/processed/regime_labels.csv (modified 2026-04-10) -->
-
-**Regime detection:** 2010-08-23 to 2026-04-10. Current regime: **stress**. Distribution: transition (43.2%), calm (43.2%), stress (13.6%).
+> **Data unavailable** -- run the pipeline first. Missing: `cluster_assignments.parquet`
+> **Data unavailable** -- run the pipeline first. Missing: `regime_labels.csv`
 
 <!-- Generated from data/processed/bootstrap_results.json (modified 2026-03-31) -->
 
@@ -41,21 +36,7 @@ The pipeline runs automatically via cron, producing daily HTML reports with inte
 ## Latest Pipeline Results
 
 <!-- BEGIN:DYNAMIC latest_results -->
-<!-- Generated from data/processed/cluster_assignments.parquet (modified 2026-04-10) -->
-<!-- Generated from data/processed/regime_labels.csv (modified 2026-04-10) -->
-<!-- Generated from data/processed/bootstrap_results.json (modified 2026-03-31) -->
-
-| Metric | Value |
-|--------|-------|
-| Universe defined | 134 ETFs across 19 asset groups |
-| Assets surviving cleaning | 76 of 134 |
-| Rolling windows | 767 |
-| Active clusters (latest window) | 8 |
-| Trading days | 3,932 (2010-08-23 to 2026-04-10) |
-| HMM regimes | 3: transition (43.2%), calm (43.2%), stress (13.6%) |
-| Mean CMI | 0.113 |
-| Mean TDS | -0.023 |
-| Daily report size | ~406 KB |
+> **Data unavailable** -- run the pipeline first. Missing: `pandas (not installed)`
 <!-- END:DYNAMIC latest_results -->
 
 ## Repository Structure
@@ -460,5 +441,5 @@ If you use this work in academic research, please cite:
 > **Reminder:** This project is for educational and research purposes only. It does not constitute investment advice. See the full disclaimer in the [research report](outputs/final_report.pdf).
 
 <!-- BEGIN:DYNAMIC generation_stamp -->
-*Auto-generated on 2026-04-12 01:50 ET from pipeline artifacts. Do not edit this section manually.*
+*Auto-generated on 2026-04-30 23:56 ET from pipeline artifacts. Do not edit this section manually.*
 <!-- END:DYNAMIC generation_stamp -->
