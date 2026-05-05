@@ -441,5 +441,5 @@ If you use this work in academic research, please cite:
 > **Reminder:** This project is for educational and research purposes only. It does not constitute investment advice. See the full disclaimer in the [research report](outputs/final_report.pdf).
 
 <!-- BEGIN:DYNAMIC generation_stamp -->
-*Auto-generated on 2026-04-30 23:56 ET from pipeline artifacts. Do not edit this section manually.*
+*Auto-generated on 2026-05-05 08:45 ET from pipeline artifacts. Do not edit this section manually.*
 <!-- END:DYNAMIC generation_stamp -->
